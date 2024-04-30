@@ -1,8 +1,10 @@
 ﻿@page "/counter"
 @using MudBlazor
 @using Domain 
+@using global::Shared;
 @inject IJSRuntime JSRuntime
 @inject ISnackbar Snackbar
+@inject HttpClient httpClient
 
 <h1>Messages</h1>
 
@@ -41,7 +43,7 @@
 </style>
 <div class="container">
     <div class="post">
-        <MudTextField @bind-Value="@newPostContent" Label="Standard" Variant="Variant.Text" Margin="Margin.Dense"
+        <MudTextField @bind-Value="@message.Content" Label="Standard" Variant="Variant.Text" Margin="Margin.Dense"
                                     AutoGrow Class="small-mud-textfield"></MudTextField>
 
         <div>
@@ -127,6 +129,8 @@
     private const string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full z-10";
     private string _dragClass = DefaultDragClass;
     private readonly List<string> _fileNames = new();
+    private MessageDto message = new();
+    private string newMessageError = "";
 
 
     private async Task Clear()
@@ -179,10 +183,18 @@
         showAddPostForm = !showAddPostForm;
     }
 
-    private void AddPost()
+    public async Task AddPost()
     {
-        // Add logic to handle adding the post with newPostContent
-        newPostContent = "";
-        showAddPostForm = false;
+        message.IntendedFor = "Moderator";
+        var result = await this.httpClient.PostAsJsonAsync("/api/message", message);
+
+        if (!result.IsSuccessStatusCode)
+            newMessageError = await result.Content.ReadAsStringAsync();
+        else
+        {
+            newMessageError = string.Empty;
+            message = new();
+            StateHasChanged();
+        }
     }
 }

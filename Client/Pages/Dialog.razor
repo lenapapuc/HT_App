@@ -1,0 +1,130 @@
+﻿
+
+@inject HttpClient httpClient
+
+@using global::Shared;
+<div class="dialog">
+    <MudDialog>
+        <DialogContent>
+            <MudAvatar Color="Color.Primary">M</MudAvatar>
+            <div class="content">
+                <MudTextField @bind-Value="@message.Content" Style="width: 380px; display=flex; justify-content:end;" T="string" Label="AutoGrow" Variant="Variant.Text" AutoGrow HelperText="This field grows when you enter new lines" />
+            <div class="icons">
+                     <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
+                         <ButtonTemplate>
+                             <MudIconButton HtmlTag="label"
+                                            Color="Color.Dark"
+                                            Icon="@Icons.Material.Filled.Image"
+                                            for="@context.Id">
+                             </MudIconButton>
+                         </ButtonTemplate>
+                     </MudFileUpload>
+
+                     
+            </div>
+        </div>
+
+            
+         </DialogContent>
+        
+    
+         <DialogActions >
+             <div class="actions">
+                 <h6>Alege cu cine să împărtășești: </h6>
+             <div class="checkboxes">
+                 
+                 <MudCheckBox @bind-Value="@CheckBox1" Color="Color.Primary" Label="Comunitate"></MudCheckBox>
+                 <MudCheckBox @bind-Value="@CheckBox2" Color="Color.Primary" Label="Psiholog"></MudCheckBox>
+                 <MudCheckBox @bind-Value="@CheckBox3" Color="Color.Primary" Label="Moderator"></MudCheckBox>
+
+
+             </div>
+           
+             <MudButton Color="Color.Primary" OnClick="Submit">Postează</MudButton>
+             </div>
+         </DialogActions>
+     </MudDialog>
+
+ </div>
+
+ <style>
+     .dialog {
+         width: 600px;
+         border-radius: 400px;
+         display: flex;
+         flex-direction: column;
+         justify-content: center;
+         align-items: center;
+         padding: 10px;
+     }
+     .text
+     {
+         width: 20px;
+     }
+     .mud-dialog-content
+     {
+         padding: 0px ;
+         width: 500px;
+         display: flex;
+         justify-content: space-between; /* Distribute items evenly along the main axis */ 
+
+     }
+     .content
+{
+    padding-top: 0;
+}
+.checkboxes
+{
+    padding-top: 5px;
+    display: flex;
+         justify-content: space-between;
+
+}
+.actions
+{
+         display: flex;
+         flex-direction: column;
+    
+}
+    
+ </style>
+
+ @code {
+    string SelectedValue { get; set; }
+    bool folderOneExpanded;
+    bool folderTwoExpanded;
+
+    public bool CheckBox1 { get; set; } = false;
+
+    public bool CheckBox3 { get; set; } = false;
+    public bool CheckBox2 { get; set; } = false;
+
+    private string newMessageError = "";
+    public MessageDto message = new();
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    public async Task Submit()
+    {
+        if (CheckBox1 == true) message.IntendedFor = "Community";
+        else if (CheckBox2 == true) message.IntendedFor = "Psychologist";
+        else if (CheckBox3 == true) message.IntendedFor = "Moderator";
+        var result = await this.httpClient.PostAsJsonAsync("/api/messages", message);
+
+
+        if (!result.IsSuccessStatusCode)
+            newMessageError = await result.Content.ReadAsStringAsync();
+        else
+        {
+            newMessageError = string.Empty;
+            message = new();
+            StateHasChanged();
+        }
+    }
+    void Cancel() => MudDialog.Cancel();
+    IList<IBrowserFile> files = new List<IBrowserFile>();
+    private void UploadFiles(IBrowserFile file)
+    {
+        files.Add(file);
+    }
+}

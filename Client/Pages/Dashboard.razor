@@ -1,0 +1,43 @@
+﻿@page "/dashboard"
+@layout EmptyLayout
+@using MudBlazor
+@using Domain
+@using global::Shared
+@inject IJSRuntime JSRuntime
+@inject ISnackbar Snackbar
+@inject HttpClient httpClient
+@inject IDialogService DialogService
+
+<style>
+    .background
+    {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column
+       
+    }
+   
+</style>
+
+<div class="background">
+    <h1 class="message">DISCUȚII FORUM</h1>
+    <div class="messages">
+
+    </div>
+    
+<MudButton @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
+    Open Simple Dialog
+</MudButton>
+</div>
+
+@code {
+    
+    private void OpenDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogService.Show<Dialog>("Începe o discuție", options);
+    }
+}

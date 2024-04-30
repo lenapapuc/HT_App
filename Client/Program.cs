@@ -1,4 +1,3 @@
-
 using Infrastructure;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -7,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
+using System.Net.Http; // Add this namespace
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -15,6 +15,12 @@ builder.Services.AddInfrastructure(configuration);
 
 builder.Services.AddMudServices();
 
+// Add HttpClient service
+builder.Services.AddScoped<HttpClient>(s =>
+{
+    var uriHelper = s.GetRequiredService<NavigationManager>();
+    return new HttpClient { BaseAddress = new Uri(uriHelper.BaseUri) };
+});
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
@@ -33,7 +39,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
 app.UseAuthorization();
 
 
