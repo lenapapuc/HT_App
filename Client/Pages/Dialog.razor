@@ -1,6 +1,9 @@
-﻿
+﻿@inject HttpClient httpClient
 
-@inject HttpClient httpClient
+@using MudBlazor
+@inject IJSRuntime JSRuntime
+
+@inject ISnackbar Snackbar
 
 @using global::Shared;
 <div class="dialog">
@@ -9,7 +12,7 @@
             <MudAvatar Color="Color.Primary">M</MudAvatar>
             <div class="content">
                 <MudTextField @bind-Value="@message.Content" Style="width: 380px; display=flex; justify-content:end;" T="string" Label="AutoGrow" Variant="Variant.Text" AutoGrow HelperText="This field grows when you enter new lines" />
-            <div class="icons">
+                 <div class="icons">
                      <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
                          <ButtonTemplate>
                              <MudIconButton HtmlTag="label"
@@ -20,32 +23,32 @@
                          </ButtonTemplate>
                      </MudFileUpload>
 
-                     
-            </div>
-        </div>
 
-            
+                 </div>
+             </div>
+
+
          </DialogContent>
-        
-    
-         <DialogActions >
+
+
+         <DialogActions>
              <div class="actions">
                  <h6>Alege cu cine să împărtășești: </h6>
-             <div class="checkboxes">
-                 
-                 <MudCheckBox @bind-Value="@CheckBox1" Color="Color.Primary" Label="Comunitate"></MudCheckBox>
-                 <MudCheckBox @bind-Value="@CheckBox2" Color="Color.Primary" Label="Psiholog"></MudCheckBox>
-                 <MudCheckBox @bind-Value="@CheckBox3" Color="Color.Primary" Label="Moderator"></MudCheckBox>
+                 <div class="checkboxes">
+
+                     <MudCheckBox @bind-Value="@CheckBox1" Color="Color.Primary" Label="Comunitate"></MudCheckBox>
+                     <MudCheckBox @bind-Value="@CheckBox2" Color="Color.Primary" Label="Psiholog"></MudCheckBox>
+                     <MudCheckBox @bind-Value="@CheckBox3" Color="Color.Primary" Label="Moderator"></MudCheckBox>
 
 
-             </div>
-           
-             <MudButton Color="Color.Primary" OnClick="Submit">Postează</MudButton>
+                 </div>
+
+                 <MudButton Color="Color.Primary" OnClick="Submit">Postează</MudButton>
              </div>
          </DialogActions>
      </MudDialog>
-
  </div>
+
 
  <style>
      .dialog {
@@ -57,39 +60,39 @@
          align-items: center;
          padding: 10px;
      }
-     .text
-     {
+
+     .text {
          width: 20px;
      }
-     .mud-dialog-content
-     {
-         padding: 0px ;
+
+     .mud-dialog-content {
+         padding: 0px;
          width: 500px;
          display: flex;
-         justify-content: space-between; /* Distribute items evenly along the main axis */ 
-
+         justify-content: space-between; /* Distribute items evenly along the main axis */
      }
-     .content
-{
-    padding-top: 0;
-}
-.checkboxes
-{
-    padding-top: 5px;
-    display: flex;
-         justify-content: space-between;
 
-}
-.actions
-{
+     .content {
+         padding-top: 0;
+     }
+
+     .checkboxes {
+         padding-top: 5px;
+         display: flex;
+         justify-content: space-between;
+     }
+
+     .actions {
          display: flex;
          flex-direction: column;
-    
-}
-    
+     }
  </style>
 
  @code {
+    [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private IDialogService DialogService { get; set; }
+
+
     string SelectedValue { get; set; }
     bool folderOneExpanded;
     bool folderTwoExpanded;
@@ -100,18 +103,31 @@
     public bool CheckBox2 { get; set; } = false;
 
     private string newMessageError = "";
-    public MessageDto message = new();
+    public MessageDtoPost message = new();
 
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
     public async Task Submit()
     {
-        if (CheckBox1 == true) message.IntendedFor = "Community";
-        else if (CheckBox2 == true) message.IntendedFor = "Psychologist";
-        else if (CheckBox3 == true) message.IntendedFor = "Moderator";
+        if (CheckBox1 == false && CheckBox2 == false && CheckBox3 == false)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Selectați un recipient");
+
+
+        }
+
+        else if (CheckBox1 == true && CheckBox2 == false && CheckBox3 == false) message.IntendedFor = "Community";
+        else if (CheckBox2 == true && CheckBox3 == false && CheckBox1 == false) message.IntendedFor = "Psychologist";
+        else if (CheckBox3 == true && CheckBox2 == false && CheckBox1 == false) message.IntendedFor = "Moderator";
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Selectați un singur recipient");
+            return;
+        }
+
         var result = await this.httpClient.PostAsJsonAsync("/api/messages", message);
 
-
+        // Your existing code here
         if (!result.IsSuccessStatusCode)
             newMessageError = await result.Content.ReadAsStringAsync();
         else
@@ -119,12 +135,18 @@
             newMessageError = string.Empty;
             message = new();
             StateHasChanged();
+            NavigationManager.NavigateTo("/dashboard");
+           
+
+
         }
+
     }
-    void Cancel() => MudDialog.Cancel();
     IList<IBrowserFile> files = new List<IBrowserFile>();
     private void UploadFiles(IBrowserFile file)
     {
         files.Add(file);
     }
+
+
 }

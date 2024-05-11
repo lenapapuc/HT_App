@@ -1,3 +1,4 @@
+
 using Infrastructure;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -5,21 +6,36 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor;
 using MudBlazor.Services;
 using System.Net.Http; // Add this namespace
 
 var builder = WebApplication.CreateBuilder(args);
+
 var configuration = builder.Configuration;
 builder.Services.AddInfrastructure(configuration);
 // Add services to the container.
 
 builder.Services.AddMudServices();
 
+
 // Add HttpClient service
 builder.Services.AddScoped<HttpClient>(s =>
 {
     var uriHelper = s.GetRequiredService<NavigationManager>();
     return new HttpClient { BaseAddress = new Uri(uriHelper.BaseUri) };
+});
+builder.Services.AddMudServices(config =>
+{
+    config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
+
+    config.SnackbarConfiguration.PreventDuplicates = false;
+    config.SnackbarConfiguration.NewestOnTop = false;
+    config.SnackbarConfiguration.ShowCloseIcon = true;
+    config.SnackbarConfiguration.VisibleStateDuration = 10000;
+    config.SnackbarConfiguration.HideTransitionDuration = 500;
+    config.SnackbarConfiguration.ShowTransitionDuration = 500;
+    config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
 });
 
 var app = builder.Build();

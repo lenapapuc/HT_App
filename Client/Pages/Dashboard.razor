@@ -1,43 +1,102 @@
 ﻿@page "/dashboard"
 @layout EmptyLayout
+
 @using MudBlazor
 @using Domain
 @using global::Shared
 @inject IJSRuntime JSRuntime
 @inject ISnackbar Snackbar
 @inject HttpClient httpClient
+
+
 @inject IDialogService DialogService
 
 <style>
-    .background
-    {
+    .background {
         width: 100%;
         height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
         flex-direction: column
-       
     }
-   
+    .message-div
+    {
+        border-color: black;
+        border-width: 1px;
+        background-color: tan;
+        margin-bottom: 5px;
+       
+
+    }
+
+    .messages
+    {
+        width: inherit;
+        padding-left: 30px;
+    }
+
 </style>
 
 <div class="background">
     <h1 class="message">DISCUȚII FORUM</h1>
-    <div class="messages">
 
+    <MudButton @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
+        Începe o discuție
+    </MudButton>
+    <div class="messages">
+        @foreach (var message in messages.OrderByDescending(m => m.CreatedAt))
+        {
+            <MudCard Style="margin-bottom: 10px; width: 50%; background-color: #C6b9cd">
+                <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudAvatar Color="Color.Secondary">I</MudAvatar>
+                    </CardHeaderAvatar>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.body1">@message.Id</MudText>
+                        <MudText Typo="Typo.body2">Intended for: @message.IntendedFor</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+
+                <MudCardContent>
+                    <MudText Typo="Typo.body2">@message.Content</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Default" />
+                </MudCardActions>
+            </MudCard>
+        }
+
+        
     </div>
-    
-<MudButton @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
-    Open Simple Dialog
-</MudButton>
+
+  
+
 </div>
 
 @code {
-    
+    private List<MessageDto> messages = new List<MessageDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMessages();
+    }
+
     private void OpenDialog()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
         DialogService.Show<Dialog>("Începe o discuție", options);
+    }
+
+    private async Task LoadMessages()
+    {
+        messages = await httpClient.GetFromJsonAsync<List<MessageDto>>("/api/messages/community");
+        // Sort the messages by CreatedAt in descending order
+        messages = messages.OrderByDescending(m => m.CreatedAt).ToList();
+        StateHasChanged(); // Refresh the UI after loading messages
     }
 }
