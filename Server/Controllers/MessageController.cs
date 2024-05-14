@@ -21,7 +21,7 @@ namespace Server.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateMessage([FromBody] MessageDto dto)
+        public async Task<IActionResult> CreateMessage([FromBody] MessageDtoPost dto)
         {
             var command = new CreateMessageCommand()
             {

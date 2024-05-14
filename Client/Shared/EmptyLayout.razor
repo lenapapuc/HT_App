@@ -1,0 +1,34 @@
+﻿@inherits LayoutComponentBase
+<MudThemeProvider />
+<MudDialogProvider />
+<style>
+    .main
+    {
+        background-color : #FAFAFA;
+        height: 100vh;
+    }
+</style>
+<div class="main">
+    <div class="content px-4">
+        @Body
+    </div>
+</div>
+
+@code
+{
+    MudTheme MyCustomTheme = new MudTheme()
+        {
+            Typography = new Typography()
+            {
+                H1 = new H1()
+                {
+                    FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" },
+                    FontSize = "30rem",
+                    FontWeight = 900,
+                    LineHeight = 1.6,
+                    LetterSpacing = ".0075em",
+
+                }
+            }
+        };
+}
