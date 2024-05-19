@@ -1,5 +1,6 @@
 ﻿@page "/dashboard"
 @layout EmptyLayout
+@inherits LayoutComponentBase
 
 @using MudBlazor
 @using Domain
@@ -7,6 +8,7 @@
 @inject IJSRuntime JSRuntime
 @inject ISnackbar Snackbar
 @inject HttpClient httpClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 
 @inject IDialogService DialogService
@@ -29,6 +31,10 @@
        
 
     }
+    .mud-card-actions
+    {
+        align-items: center;
+    }
 
     .messages
     {
@@ -36,18 +42,33 @@
         padding-left: 30px;
     }
 
+    .message
+    {
+        padding-bottom: 20px;
+    }
+
+    .button-class
+    {
+        padding-bottom: 20px;
+    }
 </style>
-
+<AuthorizeView>
+    <Authorized>
 <div class="background">
-    <h1 class="message">DISCUȚII FORUM</h1>
+    <div class="top-row px-4 auth">
+        <LoginDisplay />
 
-    <MudButton @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
-        Începe o discuție
-    </MudButton>
+    </div>
+    <h1 class="message">DISCUȚII FORUM</h1>
+    <div class="button-class">
+        <MudButton @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
+            Începe o discuție
+        </MudButton>
+     </div>
     <div class="messages">
         @foreach (var message in messages.OrderByDescending(m => m.CreatedAt))
         {
-            <MudCard Style="margin-bottom: 10px; width: 50%; background-color: #C6b9cd">
+            <MudCard Style="margin-bottom: 10px; width: 50%;">
                 <MudCardHeader>
                     <CardHeaderAvatar>
                         <MudAvatar Color="Color.Secondary">I</MudAvatar>
@@ -57,7 +78,7 @@
                         <MudText Typo="Typo.body2">Intended for: @message.IntendedFor</MudText>
                     </CardHeaderContent>
                     <CardHeaderActions>
-                        <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async () => await Delete(message.Id))" />
                     </CardHeaderActions>
                 </MudCardHeader>
 
@@ -65,11 +86,13 @@
                     <MudText Typo="Typo.body2">@message.Content</MudText>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Reply" Color="Color.Default" />
+                    <p style="padding:0px; margin-top: 0px; margin-bottom:0px;">Reply</p>
                     <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Default" />
                 </MudCardActions>
             </MudCard>
         }
+
 
         
     </div>
@@ -77,13 +100,32 @@
   
 
 </div>
+    </Authorized>
+    <NotAuthorized>
+        <MudText Typo="Typo.h6">You are not authorized to view this page. Redirecting to login...</MudText>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
+    [Inject] private NavigationManager NavigationManager { get; set; }
+
     private List<MessageDto> messages = new List<MessageDto>();
+    private bool isAuthorized = false;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadMessages();
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        isAuthorized = authState.User.Identity.IsAuthenticated;
+
+        if (isAuthorized)
+        {
+            await LoadMessages();
+        }
+        else
+        {
+            await Task.Delay(3000);
+            NavigationManager.NavigateTo("Identity/Account/Login");
+        }
     }
 
     private void OpenDialog()
@@ -98,5 +140,27 @@
         // Sort the messages by CreatedAt in descending order
         messages = messages.OrderByDescending(m => m.CreatedAt).ToList();
         StateHasChanged(); // Refresh the UI after loading messages
+    }
+
+    private async Task Delete(string id)
+    {
+        if (Guid.TryParse(id, out Guid guidId))
+        {
+            var response = await httpClient.DeleteAsync($"/api/messages/{guidId}");
+            if (response.IsSuccessStatusCode)
+            {
+                messages.RemoveAll(m => m.Id == id);
+                Snackbar.Add("Message deleted successfully.", Severity.Success);
+                StateHasChanged();
+            }
+            else
+            {
+                Snackbar.Add("Failed to delete the message.", Severity.Error);
+            }
+        }
+        else
+        {
+            Snackbar.Add("Invalid message ID.", Severity.Error);
+        }
     }
 }
