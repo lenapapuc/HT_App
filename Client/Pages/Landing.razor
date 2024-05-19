@@ -1,0 +1,141 @@
+﻿@page "/landing"
+
+@layout EmptyLayout
+
+@using MudBlazor
+@using Domain
+@using global::Shared
+@inject IJSRuntime JSRuntime
+@inject ISnackbar Snackbar
+@inject HttpClient httpClient
+
+
+@inject IDialogService DialogService
+
+
+<MudGrid Class="main-grid" Spacing="0">
+    <MudItem xs="2" Class="sidebar">
+        <MudCard Class="logo-card">
+            <MudCardContent Class="logo-content">
+                <MudText Typo="Typo.h5">Logo</MudText>
+            </MudCardContent>
+        </MudCard>
+        <MudNavMenu Class="nav-menu">
+            <MudNavLink Href="#"><MudText Typo="Typo.body1">HT app</MudText></MudNavLink>
+            <MudNavLink Href="#"><MudText Typo="Typo.body1">Charts</MudText></MudNavLink>
+            <MudNavLink Href="#"><MudText Typo="Typo.body1">Quizzes</MudText></MudNavLink>
+            <MudNavLink Href="#"><MudText Typo="Typo.body1">News</MudText></MudNavLink>
+            <MudNavLink Href="#"><MudText Typo="Typo.body1">Map</MudText></MudNavLink>
+            <MudNavLink Href="#"><MudText Typo="Typo.body1">Donation</MudText></MudNavLink>
+        </MudNavMenu>
+    </MudItem>
+    <MudItem xs="10" Class="content">
+        <MudGrid Spacing="3">
+            <MudItem xs="4">
+                <MudGrid>
+                    <MudItem xs="12">
+                        <MudCard Class="card">
+                            <MudCardContent>
+                                <MudText Typo="Typo.h6">Charts</MudText>
+                                <!-- Add Charts Content Here -->
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudCard Class="card">
+                            <MudCardContent>
+                                <MudText Typo="Typo.h6">Quizzes</MudText>
+                                <!-- Add Quizzes Content Here -->
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
+            <MudItem xs="4">
+                <MudCard Class="card">
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6">News list</MudText>
+                        <!-- Add News List Content Here -->
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="4">
+                <MudGrid>
+                    <MudItem xs="12">
+                        <MudCard Class="card">
+                            <MudCardContent>
+                                <MudText Typo="Typo.h6">Map</MudText>
+                                <!-- Add Map Content Here -->
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudCard Class="card">
+                            <MudCardContent>
+                                <MudText Typo="Typo.h6">Donation</MudText>
+                                <!-- Add Donation Content Here -->
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+</MudGrid>
+
+<style>
+    .main-grid {
+        height: 100vh;
+    }
+
+    .sidebar {
+        background: linear-gradient(to bottom, #3f51b5, #673ab7);
+        color: white;
+        padding: 20px;
+    }
+
+    .logo-card {
+        background: transparent;
+        box-shadow: none;
+        margin-bottom: 20px;
+    }
+
+    .logo-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-menu {
+        margin-top: 10px;
+    }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px 0;
+        }
+
+            .nav-menu a:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+    .content {
+        padding: 20px;
+        background-color: #f5f5f5;
+    }
+
+    .card {
+        margin-bottom: 20px;
+    }
+
+    .card-content {
+        padding: 10px;
+    }
+</style>
+
+@code {
+    private string LogoText { get; set; } = "Logo";
+}
+
