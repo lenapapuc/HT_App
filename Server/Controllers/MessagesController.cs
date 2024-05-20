@@ -77,7 +77,8 @@ namespace Server.Controllers
                     Content = message.Content,
                     IntendedFor = message.IntendedFor,
                     CreatedAt = message.CreatedDate,
-                    UserId = message.CreatedBy.Id.ToString()
+                    UserId = message.CreatedBy.Id.ToString(),
+                    Name = message.CreatedBy.Name
                 };
 
                 messageList.Add(messageDto);

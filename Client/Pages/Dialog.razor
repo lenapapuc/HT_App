@@ -15,7 +15,7 @@
 <div class="dialog">
     <MudDialog>
         <DialogContent>
-            <MudAvatar Color="Color.Primary">M</MudAvatar>
+            <MudAvatar Color="Color.Primary" Size="Size.Large">@currentUser.Name.Substring(0,1).ToUpper()</MudAvatar>
             <div class="content">
                 <MudTextField @bind-Value="@message.Content" Style="width: 380px; display=flex; justify-content:end;" T="string" Label="AutoGrow" Variant="Variant.Text" AutoGrow HelperText="This field grows when you enter new lines" />
                  <div class="icons">
