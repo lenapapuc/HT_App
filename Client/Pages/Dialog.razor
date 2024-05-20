@@ -1,7 +1,13 @@
 ﻿@inject HttpClient httpClient
 
+@using Microsoft.AspNetCore.Identity;
 @using MudBlazor
 @inject IJSRuntime JSRuntime
+@inject UserManager<User> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+
+
 
 @inject ISnackbar Snackbar
 
@@ -9,7 +15,7 @@
 <div class="dialog">
     <MudDialog>
         <DialogContent>
-            <MudAvatar Color="Color.Primary">M</MudAvatar>
+            <MudAvatar Color="Color.Primary" Size="Size.Large">@currentUser.Name.Substring(0,1).ToUpper()</MudAvatar>
             <div class="content">
                 <MudTextField @bind-Value="@message.Content" Style="width: 380px; display=flex; justify-content:end;" T="string" Label="AutoGrow" Variant="Variant.Text" AutoGrow HelperText="This field grows when you enter new lines" />
                  <div class="icons">
@@ -102,6 +108,7 @@
     [Inject] private IDialogService DialogService { get; set; }
 
 
+
     string SelectedValue { get; set; }
     bool folderOneExpanded;
     bool folderTwoExpanded;
@@ -113,11 +120,38 @@
 
     private string newMessageError = "";
     public MessageDtoPost message = new();
+    private User currentUser;
 
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            // Get the currently logged-in user
+            currentUser = await UserManager.GetUserAsync(user);
+        }
+        else
+        {
+            // Handle unauthenticated state if needed
+        }
+    }
+
+
     public async Task Submit()
     {
+        if (currentUser == null)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Utilizatorul nu este autentificat.");
+            return;
+        }
+
+        message.UserId = currentUser.Id.ToString();
+  
+
         if (CheckBox1 == false && CheckBox2 == false && CheckBox3 == false)
         {
             await JSRuntime.InvokeVoidAsync("alert", "Selectați un recipient");
