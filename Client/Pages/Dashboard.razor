@@ -1,7 +1,9 @@
 ﻿@page "/dashboard"
 @layout EmptyLayout
 @inherits LayoutComponentBase
-
+@inject UserManager<User> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using Microsoft.AspNetCore.Identity;
 @using MudBlazor
 @using Domain
 @using global::Shared
@@ -74,7 +76,7 @@
                         <MudAvatar Color="Color.Secondary">I</MudAvatar>
                     </CardHeaderAvatar>
                     <CardHeaderContent>
-                        <MudText Typo="Typo.body1">@message.Id</MudText>
+                        <MudText Typo="Typo.body1">@currentUser.Name</MudText>
                         <MudText Typo="Typo.body2">Intended for: @message.IntendedFor</MudText>
                     </CardHeaderContent>
                     <CardHeaderActions>
@@ -111,14 +113,21 @@
 
     private List<MessageDto> messages = new List<MessageDto>();
     private bool isAuthorized = false;
+    private User currentUser;
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
         isAuthorized = authState.User.Identity.IsAuthenticated;
 
-        if (isAuthorized)
+        
+
+
+        if (user.Identity.IsAuthenticated )
         {
+            // Get the currently logged-in user
+            currentUser = await UserManager.GetUserAsync(user);
             await LoadMessages();
         }
         else
@@ -126,6 +135,9 @@
             await Task.Delay(3000);
             NavigationManager.NavigateTo("Identity/Account/Login");
         }
+
+       
+        
     }
 
     private void OpenDialog()

@@ -2,7 +2,7 @@
     using Application.Commands.CreateMessage;
     using Infrastructure;
     using System.Reflection;
-using Client;
+
 
     var builder = WebApplication.CreateBuilder(args);
     var configuration = builder.Configuration;

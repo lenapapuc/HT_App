@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using System.Net;
 using System.Reflection.Metadata.Ecma335;
+using Microsoft.AspNetCore.Identity;
 
 namespace Server.Controllers
 {
@@ -16,15 +17,23 @@ namespace Server.Controllers
     public class MessagesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public MessagesController(ApplicationDbContext context)
+        public MessagesController(ApplicationDbContext context, UserManager<User> userManager)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _userManager = userManager;
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateMessage([FromBody] MessageDtoPost dto)
         {
+            var user = await _userManager.FindByIdAsync(dto.UserId);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
             if (dto == null)
             {
                 return BadRequest("Message data is null");
@@ -35,7 +44,8 @@ namespace Server.Controllers
 
                 Content = dto.Content,
                 IntendedFor = dto.IntendedFor,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTime.Now,
+                CreatedBy = user
             };
 
             try
@@ -57,7 +67,7 @@ namespace Server.Controllers
         [Route("community")]
         public async Task<List<MessageDto>> GetMessagesCommunity()
         {
-            var messages = await _context.Messages.Where(c => c.IntendedFor == "Community").ToListAsync();
+            var messages = await _context.Messages.Include(m=>m.CreatedBy).Where(c => c.IntendedFor == "Community").ToListAsync();
             List<MessageDto> messageList = new List<MessageDto>();
             foreach (var message in messages)
             {
@@ -66,7 +76,8 @@ namespace Server.Controllers
                     Id = message.Id.ToString(),
                     Content = message.Content,
                     IntendedFor = message.IntendedFor,
-                    CreatedAt = message.CreatedDate
+                    CreatedAt = message.CreatedDate,
+                    UserId = message.CreatedBy.Id.ToString()
                 };
 
                 messageList.Add(messageDto);
@@ -89,7 +100,8 @@ namespace Server.Controllers
                     Id = message.Id.ToString(),
                     Content = message.Content,
                     IntendedFor = message.IntendedFor,
-                    CreatedAt = message.CreatedDate
+                    CreatedAt = message.CreatedDate,
+                    UserId = message.CreatedBy.Id.ToString()
                 };
 
                 messageList.Add(messageDto);
@@ -112,7 +124,8 @@ namespace Server.Controllers
                     Id = message.Id.ToString(),
                     Content = message.Content,
                     IntendedFor = message.IntendedFor,
-                    CreatedAt = message.CreatedDate
+                    CreatedAt = message.CreatedDate,
+                    UserId = message.CreatedBy.Id.ToString()
                 };
 
                 messageList.Add(messageDto);
@@ -133,7 +146,8 @@ namespace Server.Controllers
                 Id = message.Id.ToString(),
                 Content = message.Content,
                 IntendedFor = message.IntendedFor,
-                CreatedAt = message.CreatedDate
+                CreatedAt = message.CreatedDate,
+                UserId = message.CreatedBy.Id.ToString()
             };
 
 

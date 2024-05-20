@@ -1,0 +1,24 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Domain
+@inject UserManager<User> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@code {
+    private string userName;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            var appUser = await UserManager.GetUserAsync(user);
+            userName = appUser?.Name;
+        }
+    }
+}
+
+@if (!string.IsNullOrEmpty(userName))
+{
+    <a href="Identity/Account/Manage">Hello, @userName!</a>
+}
