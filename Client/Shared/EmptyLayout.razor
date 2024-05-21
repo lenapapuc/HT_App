@@ -2,16 +2,162 @@
 <MudThemeProvider />
 <MudDialogProvider />
 <style>
-    .main
-    {
-        background-color : #FAFAFA;
-        height: 100vh;
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
     }
+
+    .main {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background-color: #f4f4f9;
+    }
+
+    .content {
+        flex: 1; /* This makes the content area grow and take available space */
+        padding: 0;
+        margin: 0;
+    }
+
+    .footer {
+        background-color: #800000; /* Dark background color */
+        color: #fff; /* Light text color */
+        padding: 20px 0;
+        width: 100%;
+    }
+
+    .footer-container {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .footer-section {
+        flex: 1;
+        min-width: 200px;
+        margin: 10px 0;
+    }
+
+        .footer-section h4 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            border-bottom: 2px solid #fff;
+            padding-bottom: 5px;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+            .footer-section ul li {
+                margin: 5px 0;
+            }
+
+                .footer-section ul li a {
+                    color: #fff;
+                    text-decoration: none;
+                    transition: color 0.3s ease;
+                }
+
+                    .footer-section ul li a:hover {
+                        color: #ddd;
+                    }
+
+    .social-media-icons a {
+        margin: 0 5px;
+    }
+
+    .social-media-icons img {
+        width: 24px;
+        height: 24px;
+        transition: transform 0.3s ease;
+    }
+
+        .social-media-icons img:hover {
+            transform: scale(1.1);
+        }
+
+    .footer-section form {
+        display: flex;
+    }
+
+        .footer-section form input[type="email"] {
+            padding: 10px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            flex: 1;
+        }
+
+        .footer-section form button {
+            padding: 10px;
+            border: none;
+            background-color: #333;
+            color: #fff;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            .footer-section form button:hover {
+                background-color: #555;
+            }
+
+    .footer-bottom {
+        text-align: center;
+        padding: 10px 20px;
+        border-top: 1px solid #fff;
+        margin-top: 20px;
+        font-size: 0.9em;
+    }
+
+
 </style>
+
+
+
+
 <div class="main">
-    <div class="content" style="padding:0; margin:0; padding-top:0px;"> 
+    <div class="content">
         @Body
     </div>
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Follow Us</h4>
+                <div class="social-media-icons">
+                    <a href="#"><MudIconButton Icon="@Icons.Custom.Brands.Facebook" /></a>
+                    <a href="#"><MudIconButton Icon="@Icons.Custom.Brands.Twitter" /></a>
+                    <a href="#"><MudIconButton Icon="@Icons.Custom.Brands.Instagram" /></a>
+                    <a href="#"><MudIconButton Icon="@Icons.Custom.Brands.LinkedIn" /></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Newsletter</h4>
+                <form>
+                    <input type="email" placeholder="Enter your email" required>
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 HT_App. All rights reserved.</p>
+        </div>
+    </footer>
 </div>
 
 @code
@@ -27,7 +173,6 @@
                     FontWeight = 900,
                     LineHeight = 1.6,
                     LetterSpacing = ".0075em",
-
                 }
             }
         };

@@ -16,6 +16,52 @@
 @inject IDialogService DialogService
 
 <style>
+    .left-side
+    {
+        width: 70%;
+        display: flex;
+        flex-direction: column;
+        
+        align-items: center;
+    }
+    .right-side
+    {
+        width:30%;
+        margin-right:100px;
+        background-color: #D9D9D9;
+        height: 920px;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: start;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+       
+        
+    }
+
+    .dialogue
+    {
+        height: 125px;
+        width:70%;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+       
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+    .sides
+    {
+        width:inherit;
+        height: 100%;
+        display: flex;
+    }
     .background {
         padding: 0px;
         width: 100%;
@@ -26,29 +72,84 @@
         flex-direction: column
     }
 
+    .custom-font {
+        font-family: 'Inter', sans-serif; /* Use Roboto font, fallback to sans-serif */
+        /* Add other font properties as needed */
+    }
+
+    
+.inter-message {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 800;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0;
+   color: black;
+   padding-bottom: 20px;
+}
+
+
+
     .message-div
     {
+        font-family: "Inter", sans-serif;
+        font-optical-sizing: inherit;
+        font-weight: 400;
+        font-size: 20px;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+        color: black;
         border-color: black;
         border-width: 1px;
         background-color: tan;
         margin-bottom: 5px;
-       
-
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     .mud-card-actions
     {
         align-items: center;
     }
 
-    .messages
-    {
-        width: inherit;
-        padding-left: 30px;
+    .mud-avatar-filled.mud-avatar-filled-primary {
+        background-color: #800000;
     }
 
+    .mud-avatar-filled
+    {
+        background-color: #800000;
+        color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .messages
+    {
+        
+        width: 70%;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        max-height: 700px; /* Set a fixed height */
+        min-height: 100px;
+    overflow-y: auto; /* Enable vertical scrolling */
+        
+        font-family: 'Inter', sans-serif;
+    }
+
+    .mud-elevation-1
+    {
+        box-shadow:unset;
+    }
+
+    .mud-paper
+    {
+        border-bottom: 1px solid #e0e0e0;
+    }
     .message
     {
-        padding-bottom: 20px;
+        padding-bottom: 30px;
     }
 
     .button-class
@@ -56,69 +157,168 @@
         padding-bottom: 20px;
     }
 
+    .mud-card-header-content
+    {
+        font-family: "Inter", sans-serif;
+        font-optical-sizing: inherit;
+        font-weight: 400;
+        font-size: 20px;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+        color: black;
+
+    }
+
     .top-row 
     {
-        background-color: #f7f7f7;
+        background-color: #800000;
         border-bottom: 1px solid #d6d5d5;
-        justify-content: flex-end;
+        justify-content: space-between;
         height: 3.5rem;
         display: flex;
         align-items: center;
+
         width: inherit;
         padding: 0px;
-        margin-bottom: 20px;
+        margin-bottom: 40px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
     }
+
+    .disc
+    {
+        font-family: "Inter", sans-serif;
+        font-optical-sizing: inherit;
+        font-weight: 400;
+        font-size: 20px;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+        color: black;
+        height: inherit;
+        width: 40%; display: flex;
+        flex-direction:column;
+        align-items: start;
+        justify-content: center;
+        padding-left: 0;
+    }
+
+    .psmd
+    {
+        font-family: "Inter", sans-serif;
+        top:0;
+        font-weight: 800;
+        font-size: 20px;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+        color: black;
+        height: inherit;
+     
+
+    }
+
+    .root
+    {
+        font-family: "Inter", sans-serif;
+        font-weight: 800;
+        font-size: 20px;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+        color: white;
+        background-color: #800000;
+        margin-left: 50px;
+    }
+
+    .posts
+    {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
 </style>
 <AuthorizeView>
     <Authorized>
 <div class="background">
     <div class="top-row">
-        <LoginDisplay />
-
+        <button class="root" @onclick="NavigateToRoot">HT_App</button>
+                <div style="display:flex; padding-bottom:0;"> <LoginDisplay /></div>
+       
     </div>
-    <h1 class="message">DISCUȚII FORUM</h1>
-    <div class="button-class">
-        <MudButton @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
-            Începe o discuție
-        </MudButton>
+    <div class="sides">
+        <div class="left-side">
+             <h1 class="inter-message">DISCUȚII FORUM</h1>
+
+             
+                <button class="dialogue" @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
+                    <div style="width:30%; height: inherit; display:flex; justify-content:center; align-items:center">
+                        <MudAvatar Color="Color.Primary" Size="Size.Large">L</MudAvatar>
+                        </div>
+                        <div class="disc">
+                            <p style="padding-bottom:0; margin-bottom:0; padding-top: 30px;">Începe o discuție...</p>
+                            <div class="icons">
+                                <MudIconButton Icon="@Icons.Material.Filled.AttachFile" Color="Color.Dark" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Image" Color="Color.Dark" />
+                                <MudIconButton Icon="@Icons.Material.Filled.InsertEmoticon" Color="Color.Dark" />
+                                
+
+                            </div>
+                        </div>
+                        <div class="buton" style="width:30%; height: inherit; display:flex; justify-content:center; align-items:center">
+                            <buttton style="height:auto; background-color: #170202; color: white; padding: 10px; border-radius: 20px;">Postează</buttton>
+                            </div>
+                </button>
+            
+             <div class="messages">
+                @foreach (var message in messages.OrderByDescending(m => m.CreatedAt))
+                {
+                            var avatarColor = GetRandomAvatarColor();
+                    <MudCard Style="margin-bottom: 10px;">
+                        <MudCardHeader>
+                            <CardHeaderAvatar>
+                                        <MudAvatar Size="Size.Large">@message.Name.Substring(0, 1).ToUpper()</MudAvatar>
+                            </CardHeaderAvatar>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.body1">@message.Name</MudText>
+                                <MudText Typo="Typo.body2">Intended for: @message.IntendedFor</MudText>
+                            </CardHeaderContent>
+                            <CardHeaderActions>
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async () => await Delete(message.Id))" />
+                            </CardHeaderActions>
+                        </MudCardHeader>
+
+                        <MudCardContent>
+                            <MudText Typo="Typo.body2">@message.Content</MudText>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudIconButton Icon="@Icons.Material.Filled.Reply" Color="Color.Default" />
+                            <p style="padding:0px; margin-top: 0px; margin-bottom:0px;">Reply</p>
+                            
+                        </MudCardActions>
+                    </MudCard>
+                }
+
+             </div>
+
+
+        </div>
+
+        <div class="right-side">
+           <div style="margin:0;padding:0; height:fit-content;"class="psmd">
+                        <p>CONȚINUT CREAT DE MODERATORI ȘI PSIHOLOGI</p>
+           </div>
+                    <div style="text-decoration: underline;" class="posts">
+                    <!-- Add some example content here -->
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam...</p>
+                    <p>Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris...</p>
+                    <p>Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla..  .</p>
+                    <p>Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos...</p>
+                </div>
+                </div>
+
      </div>
-    <div class="messages">
-        @foreach (var message in messages.OrderByDescending(m => m.CreatedAt))
-        {
-                    var avatarColor = GetRandomAvatarColor();
-            <MudCard Style="margin-bottom: 10px; width: 50%;">
-                <MudCardHeader>
-                    <CardHeaderAvatar>
-                                <MudAvatar Color="@avatarColor">@message.Name.Substring(0, 1).ToUpper()</MudAvatar>
-                    </CardHeaderAvatar>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.body1">@message.Name</MudText>
-                        <MudText Typo="Typo.body2">Intended for: @message.IntendedFor</MudText>
-                    </CardHeaderContent>
-                    <CardHeaderActions>
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async () => await Delete(message.Id))" />
-                    </CardHeaderActions>
-                </MudCardHeader>
-
-                <MudCardContent>
-                    <MudText Typo="Typo.body2">@message.Content</MudText>
-                </MudCardContent>
-                <MudCardActions>
-                    <MudIconButton Icon="@Icons.Material.Filled.Reply" Color="Color.Default" />
-                    <p style="padding:0px; margin-top: 0px; margin-bottom:0px;">Reply</p>
-                    <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Default" />
-                </MudCardActions>
-            </MudCard>
-        }
-
-
-        
     </div>
 
   
-
-</div>
     </Authorized>
     <NotAuthorized>
         <MudText Typo="Typo.h6">You are not authorized to view this page. Redirecting to login...</MudText>
@@ -139,7 +339,7 @@
         var user = authState.User;
         isAuthorized = authState.User.Identity.IsAuthenticated;
 
-        
+
 
 
         if (user.Identity.IsAuthenticated )
@@ -153,8 +353,8 @@
             NavigationManager.NavigateTo("Identity/Account/Login");
         }
 
-       
-        
+
+
     }
 
     private void OpenDialog()
@@ -201,5 +401,11 @@
         var random = new Random();
         var index = random.Next(0, avatarColors.Count);
         return avatarColors[index];
+    }
+
+    private void NavigateToRoot()
+    {
+        NavigationManager.NavigateTo("/");
+
     }
 }
