@@ -169,21 +169,7 @@
 
     }
 
-    .top-row 
-    {
-        background-color: #800000;
-        border-bottom: 1px solid #d6d5d5;
-        justify-content: space-between;
-        height: 3.5rem;
-        display: flex;
-        align-items: center;
 
-        width: inherit;
-        padding: 0px;
-        margin-bottom: 40px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-    }
 
     .disc
     {
@@ -216,18 +202,7 @@
 
     }
 
-    .root
-    {
-        font-family: "Inter", sans-serif;
-        font-weight: 800;
-        font-size: 20px;
-        font-style: normal;
-        font-variation-settings: "slnt" 0;
-        color: white;
-        background-color: #800000;
-        margin-left: 50px;
-    }
-
+    
     .posts
     {
         display: flex;
@@ -239,11 +214,7 @@
 <AuthorizeView>
     <Authorized>
 <div class="background">
-    <div class="top-row">
-        <button class="root" @onclick="NavigateToRoot">HT_App</button>
-                <div style="display:flex; padding-bottom:0;"> <LoginDisplay /></div>
-       
-    </div>
+   
     <div class="sides">
         <div class="left-side">
              <h1 class="inter-message">DISCUȚII FORUM</h1>
@@ -338,10 +309,6 @@
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         isAuthorized = authState.User.Identity.IsAuthenticated;
-
-
-
-
         if (user.Identity.IsAuthenticated )
         {
 
@@ -352,9 +319,6 @@
             await Task.Delay(3000);
             NavigationManager.NavigateTo("Identity/Account/Login");
         }
-
-
-
     }
 
     private void OpenDialog()
@@ -403,9 +367,5 @@
         return avatarColors[index];
     }
 
-    private void NavigateToRoot()
-    {
-        NavigationManager.NavigateTo("/");
-
-    }
+ 
 }

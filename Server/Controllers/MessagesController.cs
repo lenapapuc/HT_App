@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Net;
 using System.Reflection.Metadata.Ecma335;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Server.Controllers
 {
@@ -88,8 +89,8 @@ namespace Server.Controllers
         }
 
         [HttpGet]
-
         [Route("moderator")]
+        [Authorize(Roles = "MODERATOR")]
         public async Task<List<MessageDto>> GetMessagesModerator()
         {
             var messages = await _context.Messages.Where(c => c.IntendedFor == "Moderator").ToListAsync();
