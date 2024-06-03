@@ -183,7 +183,7 @@ namespace Server.Controllers
         [Route("{id}")]
         public async Task<MessageDto> GetMessageById(Guid id)
         {
-            var message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == id);
+            var message = await _context.Messages.Include(x => x.CreatedBy).FirstOrDefaultAsync(m => m.Id == id);
             if (message == null) throw new System.Web.Http.HttpResponseException(HttpStatusCode.NotFound); ;
             MessageDto messageDto = new MessageDto
             {
@@ -191,13 +191,15 @@ namespace Server.Controllers
                 Content = message.Content,
                 IntendedFor = message.IntendedFor,
                 CreatedAt = message.CreatedDate,
-                UserId = message.CreatedBy.Id.ToString()
+                UserId = message.CreatedBy.Id.ToString(),
+                Name = message.CreatedBy.Name
             };
 
 
             return messageDto;
 
         }
+
 
         [HttpDelete]
         [Route("{id}")]
