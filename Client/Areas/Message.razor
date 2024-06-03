@@ -1,0 +1,83 @@
+﻿@page "/message/{messageId}"
+@using global::Shared;
+@layout EmptyLayout
+@inject ISnackbar Snackbar
+@inject HttpClient httpClient
+
+
+<div class="message-details">
+    @if (message != null)
+    {
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudAvatar Size="Size.Large">@message.Name.Substring(0, 1).ToUpper()</MudAvatar>
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.body1">@message.Name</MudText>
+                    <MudText Typo="Typo.body2">Intended for: @message.IntendedFor</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+
+            <MudCardContent>
+                <MudText Typo="Typo.body2">@message.Content</MudText>
+            </MudCardContent>
+        </MudCard>
+    }
+    else
+    {
+        <MudText Typo="Typo.h6">Loading...</MudText>
+    }
+</div>
+
+<style>
+    .mud-avatar.mud-avatar-large {
+        background-color: #800000;
+        color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .mud-paper {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 50%;
+    }
+
+    .message-details {
+        display: flex;
+        justify-content: center;
+    }
+
+    .content {
+        min-height: 100vh;
+    }
+</style>
+
+@code {
+    [Parameter] public string messageId { get; set; }
+    private MessageDto message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMessage();
+    }
+
+    private async Task LoadMessage()
+    {
+        if (Guid.TryParse(messageId, out var parsedMessageId))
+        {
+            try
+            {
+                message = await httpClient.GetFromJsonAsync<MessageDto>($"/api/messages/{parsedMessageId}");
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error loading message: {ex.Message}", Severity.Error);
+            }
+        }
+        else
+        {
+            Snackbar.Add("Invalid message ID format.", Severity.Error);
+        }
+    }
+}
+

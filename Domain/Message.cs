@@ -10,9 +10,17 @@ namespace Domain
     public class Message : BaseClass
     {
         public string Content { get; set; }
-        public User CreatedBy { get; set; }
+        public User? CreatedBy { get; set; }
         public string IntendedFor { get; set; }
-        public List<Message> Replies { get; set; }
 
+        public Message? OriginalMessage { get; set; }
+
+        public void AddReply(Message reply)
+        {
+            reply.OriginalMessage = this;
+
+        }
     }
+
+
 }

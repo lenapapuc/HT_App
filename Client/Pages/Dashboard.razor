@@ -6,6 +6,7 @@
 @using Microsoft.AspNetCore.Identity;
 @using MudBlazor
 @using Domain
+@using System.Security.Claims;
 @using global::Shared
 @inject IJSRuntime JSRuntime
 @inject ISnackbar Snackbar
@@ -16,18 +17,16 @@
 @inject IDialogService DialogService
 
 <style>
-    .left-side
-    {
+    .left-side {
         width: 70%;
         display: flex;
         flex-direction: column;
-        
         align-items: center;
     }
-    .right-side
-    {
-        width:30%;
-        margin-right:100px;
+
+    .right-side {
+        width: 30%;
+        margin-right: 100px;
         background-color: #D9D9D9;
         height: 920px;
         display: flex;
@@ -38,30 +37,27 @@
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         margin-bottom: 20px;
-       
-        
     }
 
-    .dialogue
-    {
+    .dialogue {
         height: 125px;
-        width:70%;
+        width: 70%;
         display: flex;
         justify-content: space-between;
         margin-bottom: 20px;
-       
         background-color: #fff;
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         margin-bottom: 20px;
     }
-    .sides
-    {
-        width:inherit;
+
+    .sides {
+        width: inherit;
         height: 100%;
         display: flex;
     }
+
     .background {
         padding: 0px;
         width: 100%;
@@ -77,22 +73,20 @@
         /* Add other font properties as needed */
     }
 
-    
-.inter-message {
-  font-family: "Inter", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 800;
-  font-style: normal;
-  font-variation-settings:
-    "slnt" 0;
-   color: black;
-   padding-bottom: 20px;
-}
+
+    .inter-message {
+        font-family: "Inter", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 800;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+        color: black;
+        padding-bottom: 20px;
+    }
 
 
 
-    .message-div
-    {
+    .message-div {
         font-family: "Inter", sans-serif;
         font-optical-sizing: inherit;
         font-weight: 400;
@@ -106,8 +100,8 @@
         margin-bottom: 5px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    .mud-card-actions
-    {
+
+    .mud-card-actions {
         align-items: center;
     }
 
@@ -115,16 +109,13 @@
         background-color: #800000;
     }
 
-    .mud-avatar-filled
-    {
+    .mud-avatar-filled {
         background-color: #800000;
         color: white;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    .messages
-    {
-        
+    .messages {
         width: 70%;
         background-color: #fff;
         padding: 20px;
@@ -133,32 +124,28 @@
         margin-bottom: 20px;
         max-height: 700px; /* Set a fixed height */
         min-height: 100px;
-    overflow-y: auto; /* Enable vertical scrolling */
-        
+        overflow-y: auto; /* Enable vertical scrolling */
+
         font-family: 'Inter', sans-serif;
     }
 
-    .mud-elevation-1
-    {
-        box-shadow:unset;
+    .mud-elevation-1 {
+        box-shadow: unset;
     }
 
-    .mud-paper
-    {
+    .mud-paper {
         border-bottom: 1px solid #e0e0e0;
     }
-    .message
-    {
+
+    .message {
         padding-bottom: 30px;
     }
 
-    .button-class
-    {
+    .button-class {
         padding-bottom: 20px;
     }
 
-    .mud-card-header-content
-    {
+    .mud-card-header-content {
         font-family: "Inter", sans-serif;
         font-optical-sizing: inherit;
         font-weight: 400;
@@ -166,13 +153,11 @@
         font-style: normal;
         font-variation-settings: "slnt" 0;
         color: black;
-
     }
 
 
 
-    .disc
-    {
+    .disc {
         font-family: "Inter", sans-serif;
         font-optical-sizing: inherit;
         font-weight: 400;
@@ -181,30 +166,27 @@
         font-variation-settings: "slnt" 0;
         color: black;
         height: inherit;
-        width: 40%; display: flex;
-        flex-direction:column;
+        width: 40%;
+        display: flex;
+        flex-direction: column;
         align-items: start;
         justify-content: center;
         padding-left: 0;
     }
 
-    .psmd
-    {
+    .psmd {
         font-family: "Inter", sans-serif;
-        top:0;
+        top: 0;
         font-weight: 800;
         font-size: 20px;
         font-style: normal;
         font-variation-settings: "slnt" 0;
         color: black;
         height: inherit;
-     
-
     }
 
-    
-    .posts
-    {
+
+    .posts {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -213,16 +195,16 @@
 </style>
 <AuthorizeView>
     <Authorized>
-<div class="background">
-   
-    <div class="sides">
-        <div class="left-side">
-             <h1 class="inter-message">DISCUȚII FORUM</h1>
+        <div class="background">
 
-             
-                <button class="dialogue" @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
-                    <div style="width:30%; height: inherit; display:flex; justify-content:center; align-items:center">
-                        <MudAvatar Color="Color.Primary" Size="Size.Large">L</MudAvatar>
+            <div class="sides">
+                <div class="left-side">
+                    <h1 class="inter-message">DISCUȚII FORUM</h1>
+
+
+                    <button class="dialogue" @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
+                        <div style="width:30%; height: inherit; display:flex; justify-content:center; align-items:center">
+                            <MudAvatar Color="Color.Primary" Size="Size.Large">L</MudAvatar>
                         </div>
                         <div class="disc">
                             <p style="padding-bottom:0; margin-bottom:0; padding-top: 30px;">Începe o discuție...</p>
@@ -230,66 +212,70 @@
                                 <MudIconButton Icon="@Icons.Material.Filled.AttachFile" Color="Color.Dark" />
                                 <MudIconButton Icon="@Icons.Material.Filled.Image" Color="Color.Dark" />
                                 <MudIconButton Icon="@Icons.Material.Filled.InsertEmoticon" Color="Color.Dark" />
-                                
+
 
                             </div>
                         </div>
                         <div class="buton" style="width:30%; height: inherit; display:flex; justify-content:center; align-items:center">
                             <buttton style="height:auto; background-color: #170202; color: white; padding: 10px; border-radius: 20px;">Postează</buttton>
-                            </div>
-                </button>
-            
-             <div class="messages">
-                @foreach (var message in messages.OrderByDescending(m => m.CreatedAt))
-                {
-                            var avatarColor = GetRandomAvatarColor();
-                    <MudCard Style="margin-bottom: 10px;">
-                        <MudCardHeader>
-                            <CardHeaderAvatar>
+                        </div>
+                    </button>
+
+                    <div class="messages">
+                        @foreach (var message in messages.OrderByDescending(m => m.CreatedAt))
+                        {
+
+                            <MudCard Style="margin-bottom: 10px;" @onclick="() => NavigateToMessage(message.Id)">
+                                <MudCardHeader>
+                                    <CardHeaderAvatar>
                                         <MudAvatar Size="Size.Large">@message.Name.Substring(0, 1).ToUpper()</MudAvatar>
-                            </CardHeaderAvatar>
-                            <CardHeaderContent>
-                                <MudText Typo="Typo.body1">@message.Name</MudText>
-                                <MudText Typo="Typo.body2">Intended for: @message.IntendedFor</MudText>
-                            </CardHeaderContent>
-                            <CardHeaderActions>
-                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async () => await Delete(message.Id))" />
-                            </CardHeaderActions>
-                        </MudCardHeader>
+                                    </CardHeaderAvatar>
+                                    <CardHeaderContent>
+                                        <MudText Typo="Typo.body1">@message.Name</MudText>
+                                        <MudText Typo="Typo.body2">Intended for: @message.IntendedFor</MudText>
+                                    </CardHeaderContent>
+                                    <CardHeaderActions>
+                                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async () => await Delete(message.Id))" />
+                                    </CardHeaderActions>
+                                </MudCardHeader>
 
-                        <MudCardContent>
-                            <MudText Typo="Typo.body2">@message.Content</MudText>
-                        </MudCardContent>
-                        <MudCardActions>
-                            <MudIconButton Icon="@Icons.Material.Filled.Reply" Color="Color.Default" />
-                            <p style="padding:0px; margin-top: 0px; margin-bottom:0px;">Reply</p>
-                            
-                        </MudCardActions>
-                    </MudCard>
-                }
-
-             </div>
+                                <MudCardContent>
+                                    <MudText Typo="Typo.body2">@message.Content</MudText>
+                                    <p style="padding:0px; margin-top:
+px; margin-bottom:0px;">@message.RepliesNumber replies</p>
+                                </MudCardContent>
+                                <MudCardActions>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Reply" Color="Color.Default" />
+                                    <p style="padding:0px; margin-top: 0px; margin-bottom:0px;">Reply</p>
 
 
+
+                                </MudCardActions>
+                            </MudCard>
+                        }
+
+                    </div>
+
+
+                </div>
+
+                <div class="right-side">
+                    <div style="margin:0;padding:0; height:fit-content;" class="psmd">
+                        <p>CONȚINUT CREAT DE MODERATORI ȘI PSIHOLOGI</p>
+                    </div>
+                    <div style="text-decoration: underline;" class="posts">
+                        <!-- Add some example content here -->
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam...</p>
+                        <p>Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris...</p>
+                        <p>Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla..  .</p>
+                        <p>Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos...</p>
+                    </div>
+                </div>
+
+            </div>
         </div>
 
-        <div class="right-side">
-           <div style="margin:0;padding:0; height:fit-content;"class="psmd">
-                        <p>CONȚINUT CREAT DE MODERATORI ȘI PSIHOLOGI</p>
-           </div>
-                    <div style="text-decoration: underline;" class="posts">
-                    <!-- Add some example content here -->
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam...</p>
-                    <p>Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris...</p>
-                    <p>Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla..  .</p>
-                    <p>Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos...</p>
-                </div>
-                </div>
 
-     </div>
-    </div>
-
-  
     </Authorized>
     <NotAuthorized>
         <MudText Typo="Typo.h6">You are not authorized to view this page. Redirecting to login...</MudText>
@@ -299,20 +285,26 @@
 @code {
     [Inject] private NavigationManager NavigationManager { get; set; }
 
+
     private List<MessageDto> messages = new List<MessageDto>();
     private bool isAuthorized = false;
-    private User currentUser;
+    private System.Security.Claims.ClaimsPrincipal currentUser;
 
+    private string newMessageError = "";
+
+    private MessageDtoPost message = new();
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        isAuthorized = authState.User.Identity.IsAuthenticated;
-        if (user.Identity.IsAuthenticated )
-        {
+        currentUser = authState.User;
 
+        isAuthorized = authState.User.Identity.IsAuthenticated;
+        if (user.Identity.IsAuthenticated)
+        {
             await LoadMessages();
+
         }
         else
         {
@@ -357,15 +349,43 @@
         }
     }
 
-    private List<Color> avatarColors = new List<Color> { Color.Primary, Color.Secondary, Color.Tertiary };
-
-    // Method to generate a random color from the avatarColors list
-    private Color GetRandomAvatarColor()
+    public async Task PostReply(string Id)
     {
-        var random = new Random();
-        var index = random.Next(0, avatarColors.Count);
-        return avatarColors[index];
+        if (currentUser == null)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Utilizatorul nu este autentificat.");
+            return;
+        }
+
+        var userId = currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "User ID not found.");
+            return;
+        }
+
+        message.UserId = userId;
+        Guid messageId = Guid.Parse(Id);
+        message.Content = "lalala";
+        message.IntendedFor = "Community";
+        var result = await this.httpClient.PostAsJsonAsync($"/api/messages/{messageId}/reply", message);
+
+        // Your existing code here
+        if (!result.IsSuccessStatusCode)
+            newMessageError = await result.Content.ReadAsStringAsync();
+        else
+        {
+            newMessageError = string.Empty;
+            message = new();
+            StateHasChanged();
+            NavigationManager.NavigateTo("/dashboard");
+        }
     }
 
- 
+    private void NavigateToMessage(string messageId)
+    {
+        NavigationManager.NavigateTo($"/message/{messageId}");
+    }
+}
+
 }

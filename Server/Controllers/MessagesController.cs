@@ -62,6 +62,48 @@ namespace Server.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("{messageId}/reply")]
+        public async Task<IActionResult> AddReply(Guid messageId, [FromBody] MessageDtoPost dto)
+        {
+            var user = await _userManager.FindByIdAsync(dto.UserId);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+            if (dto == null)
+            {
+                return BadRequest("Message data is null");
+            }
+
+            var message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == messageId);
+            if (message == null) throw new System.Web.Http.HttpResponseException(HttpStatusCode.NotFound); ;
+
+            var reply = new Message
+            {
+
+                Content = dto.Content,
+                IntendedFor = dto.IntendedFor,
+                CreatedDate = DateTime.Now,
+                CreatedBy = user
+            };
+
+            message.AddReply(reply);
+
+            try
+            {
+                _context.Messages.Add(reply);
+                await _context.SaveChangesAsync();
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
 
         [HttpGet]
 
