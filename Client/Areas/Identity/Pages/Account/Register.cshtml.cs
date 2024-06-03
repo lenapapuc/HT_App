@@ -52,6 +52,8 @@ namespace Client.Areas.Identity.Pages.Account
         /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
+        public bool IsAdmin { get; set; }
+
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -104,12 +106,17 @@ namespace Client.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            
+            [Display(Name = "Role")]
+            public string Role { get; set; }
         }
 
 
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
+            IsAdmin = User.IsInRole("Admin");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
@@ -125,7 +132,11 @@ namespace Client.Areas.Identity.Pages.Account
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
-                await _userManager.AddToRoleAsync(user, "User");
+                if (Input.Role != null)
+                {
+                    await _userManager.AddToRoleAsync(user, Input.Role);
+                }
+                else await _userManager.AddToRoleAsync(user, "User");
 
                 if (result.Succeeded)
                 {

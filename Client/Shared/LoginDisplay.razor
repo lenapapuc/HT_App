@@ -1,12 +1,20 @@
 ﻿<AuthorizeView>
-    <Authorized>
+    <Authorized Context="userContext">
         <UserDisplay />
         <form method="post" action="Identity/Account/Logout">
             <button style="color:white; " type="submit" class="nav-link btn btn-link">Log out</button>
         </form>
+         <AuthorizeView Roles="Admin">
+            <Authorized Context="adminContext">
+                <a href="Identity/Account/Register">Register</a>
+
+            </Authorized>
+
+        </AuthorizeView>
     </Authorized>
     <NotAuthorized>
         <a href="Identity/Account/Register">Register</a>
         <a href="Identity/Account/Login">Log in</a>
     </NotAuthorized>
+    
 </AuthorizeView>
