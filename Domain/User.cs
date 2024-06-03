@@ -2,7 +2,7 @@
 
 namespace Domain
 {
-    public class User : IdentityUser<Guid>
+    public class ApplicationUser : IdentityUser<Guid>
     {
         public string Name { get; set; }
         

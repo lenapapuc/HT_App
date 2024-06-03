@@ -1,5 +1,18 @@
 ﻿@page
+
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManger
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Identity;
+@using MudBlazor
+@using Domain
+@using System.Security.Claims;
+@using global::Shared
+@inject ISnackbar Snackbar
+@inject HttpClient httpClient
 @model RegisterModel
+
 @{
     ViewData["Title"] = "Register";
 }
@@ -32,6 +45,8 @@
                 <label asp-for="Input.ConfirmPassword">Confirm Password</label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
+           
+
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </form>
     </div>

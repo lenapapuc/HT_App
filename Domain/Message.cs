@@ -10,7 +10,7 @@ namespace Domain
     public class Message : BaseClass
     {
         public string Content { get; set; }
-        public User? CreatedBy { get; set; }
+        public ApplicationUser? CreatedBy { get; set; }
         public string IntendedFor { get; set; }
 
         public Message? OriginalMessage { get; set; }

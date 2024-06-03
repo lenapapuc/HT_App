@@ -3,7 +3,7 @@
 @using Microsoft.AspNetCore.Identity;
 @using MudBlazor
 @inject IJSRuntime JSRuntime
-@inject UserManager<User> UserManager
+@inject UserManager<ApplicationUser> UserManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 
@@ -120,7 +120,7 @@
 
     private string newMessageError = "";
     public MessageDtoPost message = new();
-    private User currentUser;
+    private ApplicationUser currentUser;
 
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 

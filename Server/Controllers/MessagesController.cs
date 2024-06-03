@@ -18,9 +18,9 @@ namespace Server.Controllers
     public class MessagesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public MessagesController(ApplicationDbContext context, UserManager<User> userManager)
+        public MessagesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _userManager = userManager;

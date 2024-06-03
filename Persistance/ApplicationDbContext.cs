@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure
 {
-    public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -20,6 +20,7 @@ namespace Infrastructure
 
             base.OnModelCreating(modelBuilder);
            
+
         }
     }
 }
