@@ -3,7 +3,9 @@
 @layout EmptyLayout
 @inject ISnackbar Snackbar
 @inject HttpClient httpClient
-
+@inject NavigationManager NavigationManager
+@inject IHttpContextAccessor HttpContextAccessor
+@using Microsoft.AspNetCore.WebUtilities;
 
 <div class="message-details">
     @if (message != null)
@@ -18,11 +20,35 @@
                     <MudText Typo="Typo.body2">Intended for: @message.IntendedFor</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
-
+            
             <MudCardContent>
                 <MudText Typo="Typo.body2">@message.Content</MudText>
+
+                @if (openReplyWindow)
+                {
+                    <div class="reply-section" style="display:flex; flex-direction: row;">
+
+                        <MudTextField @bind-Value=@replyContent Label="Răspuns" Variant="Variant.Outlined" AutoGrow>
+                          
+                                
+                            
+                            </MudTextField>
+
+                     <MudButton OnClick="PostReply" Color="Color.Primary">Răspunde</MudButton>
+                            
+                      
+                        
+                    </div>
+                }
             </MudCardContent>
+           <MudCardActions>
+                                    <MudButton>
+                                        <MudIconButton Icon="@Icons.Material.Filled.Reply" Color="Color.Default" />
+                                        <p style="padding:0px; margin-top: 0px; margin-bottom:0px;">Reply</p>
+                                    </MudButton>
+                                </MudCardActions>
         </MudCard>
+
     }
     else
     {
@@ -44,20 +70,38 @@
 
     .message-details {
         display: flex;
+        flex-direction: column;
+        align-items: center;
         justify-content: center;
     }
 
     .content {
         min-height: 100vh;
     }
+
+    .reply-section {
+        margin-top: 20px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 </style>
 
 @code {
     [Parameter] public string messageId { get; set; }
     private MessageDto message;
+    private bool openReplyWindow = false;
+    private string replyContent;
 
     protected override async Task OnInitializedAsync()
     {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("reply", out var reply))
+        {
+            openReplyWindow = bool.Parse(reply);
+        }
+
         await LoadMessage();
     }
 
@@ -79,5 +123,33 @@
             Snackbar.Add("Invalid message ID format.", Severity.Error);
         }
     }
-}
 
+    private async Task PostReply()
+    {
+        if (string.IsNullOrEmpty(replyContent))
+        {
+            Snackbar.Add("Reply content cannot be empty.", Severity.Warning);
+            return;
+        }
+
+        var replyDto = new MessageDtoPost
+            {
+                Content = replyContent,
+                IntendedFor = "Community"
+            };
+
+        var result = await httpClient.PostAsJsonAsync($"/api/messages/{message.Id}/reply", replyDto);
+
+        if (result.IsSuccessStatusCode)
+        {
+            Snackbar.Add("Reply posted successfully.", Severity.Success);
+            replyContent = string.Empty;
+            openReplyWindow = false;
+            await LoadMessage(); // Reload the message to reflect the new reply
+        }
+        else
+        {
+            Snackbar.Add("Failed to post reply.", Severity.Error);
+        }
+    }
+}
