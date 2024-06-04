@@ -31,6 +31,7 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Strikes = table.Column<int>(type: "int", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -163,9 +164,9 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IntendedFor = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    OriginalMessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -175,11 +176,10 @@ namespace Infrastructure.Migrations
                         name: "FK_Messages_AspNetUsers_CreatedById",
                         column: x => x.CreatedById,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Messages_Messages_MessageId",
-                        column: x => x.MessageId,
+                        name: "FK_Messages_Messages_OriginalMessageId",
+                        column: x => x.OriginalMessageId,
                         principalTable: "Messages",
                         principalColumn: "Id");
                 });
@@ -229,9 +229,9 @@ namespace Infrastructure.Migrations
                 column: "CreatedById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Messages_MessageId",
+                name: "IX_Messages_OriginalMessageId",
                 table: "Messages",
-                column: "MessageId");
+                column: "OriginalMessageId");
         }
 
         /// <inheritdoc />
