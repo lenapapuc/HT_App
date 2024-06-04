@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 <MudThemeProvider />
 <MudDialogProvider />
+
 <style>
     html, body {
         height: 100%;
@@ -120,13 +121,13 @@
         background-color: #800000;
         border-bottom: 1px solid #d6d5d5;
         justify-content: space-between;
-        height: 3.5rem;
+        height: 3.5rem; /* Header height */
         display: flex;
         align-items: center;
         width: inherit;
         padding: 0px;
-        margin-bottom: 40px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 0; /* Remove bottom margin */
     }
 
     .root {
@@ -139,19 +140,12 @@
         background-color: #800000;
         margin-left: 50px;
     }
-
-
-
 </style>
-
-
-
 
 <div class="main">
     <div class="top-row">
         <button class="root" @onclick="NavigateToRoot">HT_App</button>
         <div style="display:flex; padding-bottom:0;"> <LoginDisplay /></div>
-
     </div>
     <div class="content">
         @Body
@@ -190,14 +184,13 @@
     </footer>
 </div>
 
-@code
-{
+@code {
     [Inject] private NavigationManager NavigationManager { get; set; }
     private void NavigateToRoot()
     {
         NavigationManager.NavigateTo("/");
-
     }
+
     MudTheme MyCustomTheme = new MudTheme()
         {
             Typography = new Typography()

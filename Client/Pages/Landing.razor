@@ -9,11 +9,10 @@
 @inject ISnackbar Snackbar
 @inject HttpClient httpClient
 
-
 @inject IDialogService DialogService
+@inject NavigationManager Navigation
 
-
-<MudGrid Class="main-grid" Spacing="0">
+<MudGrid Class="main-grid" Spacing="0" Style="margin: 0; padding: 0;">
     <MudItem xs="2" Class="sidebar">
         <MudCard Class="logo-card">
             <MudCardContent Class="logo-content">
@@ -24,7 +23,7 @@
             <MudNavLink Href="#"><MudText Typo="Typo.body1">HT app</MudText></MudNavLink>
             <MudNavLink Href="#"><MudText Typo="Typo.body1">Charts</MudText></MudNavLink>
             <MudNavLink Href="#"><MudText Typo="Typo.body1">Quizzes</MudText></MudNavLink>
-            <MudNavLink Href="#"><MudText Typo="Typo.body1">News</MudText></MudNavLink>
+             <MudNavLink Href="#"><MudText Typo="Typo.body1">News</MudText></MudNavLink>
             <MudNavLink Href="#"><MudText Typo="Typo.body1">Map</MudText></MudNavLink>
             <MudNavLink Href="#"><MudText Typo="Typo.body1">Donation</MudText></MudNavLink>
         </MudNavMenu>
@@ -37,7 +36,14 @@
                         <MudCard Class="card">
                             <MudCardContent>
                                 <MudText Typo="Typo.h6">Charts</MudText>
-                                <!-- Add Charts Content Here -->
+                                <div @onclick="NavigateToCharts" style="cursor: pointer;">
+                                <MudChart ChartType="ChartType.Donut" Width="250px" Height="250px" InputData="@data" InputLabels="@labels">
+                                    <CustomGraphics>
+                                        <text class="donut-inner-text" x="47%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">Total</text>
+                                        <text class="donut-inner-text" x="47%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@data.Sum().ToString()</text>
+                                    </CustomGraphics>
+                                </MudChart>
+                                </div>
                             </MudCardContent>
                         </MudCard>
                     </MudItem>
@@ -45,7 +51,7 @@
                         <MudCard Class="card">
                             <MudCardContent>
                                 <MudText Typo="Typo.h6">Quizzes</MudText>
-                                <!-- Add Quizzes Content Here -->
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="background-color: #673ab7;">Start Quiz</MudButton>
                             </MudCardContent>
                         </MudCard>
                     </MudItem>
@@ -84,14 +90,25 @@
 </MudGrid>
 
 <style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+    }
+
     .main-grid {
-        height: 100vh;
+        height: calc(100vh - 3.5rem); /* Adjust height based on header height */
+        margin: 0;
+        padding: 0;
     }
 
     .sidebar {
         background: linear-gradient(to bottom, #3f51b5, #673ab7);
         color: white;
         padding: 20px;
+        height: calc(100vh - 3.5rem); /* Ensure it covers the entire height minus header */
+        border-radius: 0 10px 10px 0; /* Rounded corners for the sidebar */
+        margin-top: -1px;
     }
 
     .logo-card {
@@ -110,16 +127,16 @@
         margin-top: 10px;
     }
 
-        .nav-menu a {
-            color: white;
-            text-decoration: none;
-            display: block;
-            padding: 10px 0;
-        }
+    .nav-menu a {
+        color: white;
+        text-decoration: none;
+        display: block;
+        padding: 10px 0;
+    }
 
-            .nav-menu a:hover {
-                background-color: rgba(255, 255, 255, 0.1);
-            }
+    .nav-menu a:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
 
     .content {
         padding: 20px;
@@ -128,14 +145,31 @@
 
     .card {
         margin-bottom: 20px;
+        border-radius: 10px; /* Rounded corners for cards */
     }
 
     .card-content {
         padding: 10px;
     }
+
+    .mud-button-filled {
+        background-color: #673ab7; /* Use the primary color from your theme */
+        color: white;
+    }
+
+    .mud-button-filled:hover {
+        background-color: #5e35b1; /* Slightly darker for hover effect */
+    }
 </style>
 
 @code {
     private string LogoText { get; set; } = "Logo";
-}
 
+    public double[] data = { 73, 83, 80, 58 };
+    public string[] labels = { "2015", "2018", "2019", "2022" };
+
+    private void NavigateToCharts()
+    {
+        Navigation.NavigateTo("/charts");
+    }
+}
