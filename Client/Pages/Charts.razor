@@ -14,7 +14,7 @@
 <MudGrid Class="main-grid" Spacing="0" Style="margin: 0; padding: 0;">
     <MudItem xs="8" Class="charts">
         <MudPaper Class="pa-4">
-            <MudText Typo="Typo.h5">Pie Chart</MudText>
+            <MudText Typo="Typo.h5" Class="header-color">Pie Chart</MudText>
             <MudGrid>
                 <MudItem xs="9">
                     <MudChart ChartType="ChartType.Pie" InputData="@data.ToArray()" @bind-SelectedIndex="Index" InputLabels="@labels.ToArray()" Width="300px" Height="300px" />
@@ -26,14 +26,11 @@
             </MudGrid>
         </MudPaper>
 
-        <MudPaper Class="pa-4 mt-2">
-            <MudText Typo="Typo.h5">Line Chart</MudText>
+        <MudPaper Class="pa-4 mt-0">
+            <MudText Typo="Typo.h5" Class="header-color">Line Chart</MudText>
             <div>
                 <MudChart ChartType="ChartType.Line" ChartSeries="@Series" @bind-SelectedIndex="LineIndex" XAxisLabels="@XAxisLabels" Width="100%" Height="350px" ChartOptions="@Options" />
                 <MudGrid>
-                    <MudItem xs="6">
-                        <MudText Typo="Typo.body1" Class="py-3">Selected: @(LineIndex < 0 ? "None" : Series[LineIndex].Name)</MudText>
-                    </MudItem>
                     <MudItem xs="6">
                         <MudSlider @bind-Value="Options.LineStrokeWidth" Min="1" Max="10" Color="Color.Info">Line Width: @Options.LineStrokeWidth.ToString()</MudSlider>
                     </MudItem>
@@ -43,7 +40,7 @@
     </MudItem>
     <MudItem xs="4" Class="info">
         <MudPaper Class="pa-4">
-            <MudText Typo="Typo.h5">Victim Statistics</MudText>
+            <MudText Typo="Typo.h5" Class="header-color">Victim Statistics</MudText>
             <ul class="bullet-list">
                 <li><span class="year">2010:</span> Moldova was reported to have identified approximately 108 victims of trafficking.</li>
                 <li><span class="year">2011:</span> Similar numbers to 2010, with continuous international and domestic efforts to combat trafficking.</li>
@@ -66,6 +63,7 @@
     .bullet-list {
         list-style-type: none;
         padding: 0;
+        margin-top: 1rem; /* Add margin between title and first bullet point */
     }
 
         .bullet-list li {
@@ -73,8 +71,16 @@
         }
 
     .year {
-        color: #673ab7; /* Violet color for the years */
+        color: #800000; /* Match color with the header and footer */
         font-weight: bold;
+    }
+
+    .header-color {
+        color: #800000; /* Match color with the header and footer */
+    }
+
+    .top-row {
+        margin-bottom: 0;
     }
 </style>
 
@@ -84,8 +90,8 @@
     List<double> data = new List<double> { 108, 82, 82, 69 };
     List<string> labels = new List<string> { "2010", "2012", "2013", "2014" };
 
-    private readonly List<double> allData = new List<double> { 108, 82, 82, 69, 73, 85, 86, 83, 80, 58, 58 };
-    private readonly List<string> allLabels = new List<string> { "2010", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2021", "2022" };
+    private readonly List<double> allData = new List<double> { 108, 82, 69, 73, 85, 86, 83, 80, 58, 58 };
+    private readonly List<string> allLabels = new List<string> { "2010", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2021", "2022" };
 
     void AddData()
     {
