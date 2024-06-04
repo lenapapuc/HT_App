@@ -1,4 +1,6 @@
 
+using Domain;
+using Domain.Enums;
 using Infrastructure;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -61,5 +63,39 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+
+using(var scope = app.Services .CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+
+    var roles = new[] { "Moderator", "User", "Psychologist", "Admin" };
+    foreach(var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+            await roleManager.CreateAsync(new IdentityRole<Guid>(role));
+    }
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    string email = "admin@admin.com";
+    string password = "Password1234!";
+    if(await userManager.FindByEmailAsync(email) == null)
+    {
+        var user = new ApplicationUser();
+        user.Email = email;
+        user.UserName = email;
+        user.Name = "admin";
+        var result = await userManager.CreateAsync(user, password);
+        await userManager.AddToRoleAsync(user, "Admin");
+
+    }
+
+
+}
+
+
+
 
 app.Run();

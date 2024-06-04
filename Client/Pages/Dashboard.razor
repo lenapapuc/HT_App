@@ -1,7 +1,8 @@
 ﻿@page "/dashboard"
 @layout EmptyLayout
 @inherits LayoutComponentBase
-@inject UserManager<User> UserManager
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManger
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @using Microsoft.AspNetCore.Identity;
 @using MudBlazor
@@ -12,6 +13,8 @@
 @inject ISnackbar Snackbar
 @inject HttpClient httpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@using Microsoft.AspNetCore.Components.Authorization
+
 
 
 @inject IDialogService DialogService
@@ -193,6 +196,7 @@
     }
 
 </style>
+
 <AuthorizeView>
     <Authorized>
         <div class="background">
@@ -204,7 +208,7 @@
 
                     <button class="dialogue" @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
                         <div style="width:30%; height: inherit; display:flex; justify-content:center; align-items:center">
-                            <MudAvatar Color="Color.Primary" Size="Size.Large">L</MudAvatar>
+                            <MudAvatar Color="Color.Primary" Size="Size.Large">@userInitial</MudAvatar>
                         </div>
                         <div class="disc">
                             <p style="padding-bottom:0; margin-bottom:0; padding-top: 30px;">Începe o discuție...</p>
@@ -234,9 +238,15 @@
                                         <MudText Typo="Typo.body1">@message.Name</MudText>
                                         <MudText Typo="Typo.body2">Intended for: @message.IntendedFor</MudText>
                                     </CardHeaderContent>
+                                    
                                     <CardHeaderActions>
+                                        @if(isUserInRole("Moderator"))
+                                        {
                                         <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async () => await Delete(message.Id))" />
-                                    </CardHeaderActions>
+                                        }
+                                        </CardHeaderActions>
+                                   
+
                                 </MudCardHeader>
 
                                 <MudCardContent>
@@ -285,24 +295,30 @@ px; margin-bottom:0px;">@message.RepliesNumber replies</p>
 @code {
     [Inject] private NavigationManager NavigationManager { get; set; }
 
+    private AuthenticationState authState;
 
     private List<MessageDto> messages = new List<MessageDto>();
     private bool isAuthorized = false;
     private System.Security.Claims.ClaimsPrincipal currentUser;
+    private string userInitial = "";
 
     private string newMessageError = "";
 
     private MessageDtoPost message = new();
-
+    private bool isUserInRole(string role)
+    {
+        return authState.User.IsInRole(role);
+    }
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         currentUser = authState.User;
 
         isAuthorized = authState.User.Identity.IsAuthenticated;
         if (user.Identity.IsAuthenticated)
         {
+            userInitial = user.Identity.Name.Substring(0, 1).ToUpper();
             await LoadMessages();
 
         }

@@ -2,7 +2,7 @@
 @using Domain
 @using Microsoft.AspNetCore.Identity
 @attribute [IgnoreAntiforgeryToken]
-@inject SignInManager<User> SignInManager
+@inject SignInManager<ApplicationUser> SignInManager
 @functions {
     public async Task<IActionResult> OnPost()
     {
