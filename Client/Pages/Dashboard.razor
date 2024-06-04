@@ -196,7 +196,6 @@
     }
 
 </style>
-
 <AuthorizeView>
     <Authorized>
         <div class="background">
@@ -204,7 +203,6 @@
             <div class="sides">
                 <div class="left-side">
                     <h1 class="inter-message">DISCUȚII FORUM</h1>
-
 
                     <button class="dialogue" @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
                         <div style="width:30%; height: inherit; display:flex; justify-content:center; align-items:center">
@@ -216,8 +214,6 @@
                                 <MudIconButton Icon="@Icons.Material.Filled.AttachFile" Color="Color.Dark" />
                                 <MudIconButton Icon="@Icons.Material.Filled.Image" Color="Color.Dark" />
                                 <MudIconButton Icon="@Icons.Material.Filled.InsertEmoticon" Color="Color.Dark" />
-
-
                             </div>
                         </div>
                         <div class="buton" style="width:30%; height: inherit; display:flex; justify-content:center; align-items:center">
@@ -228,8 +224,7 @@
                     <div class="messages">
                         @foreach (var message in messages.OrderByDescending(m => m.CreatedAt))
                         {
-
-                            <MudCard Style="margin-bottom: 10px;" @onclick="() => NavigateToMessage(message.Id)">
+                            <MudCard Style="margin-bottom: 10px;" @onclick="() => NavigateToMessage(message.Id, false)">
                                 <MudCardHeader>
                                     <CardHeaderAvatar>
                                         <MudAvatar Size="Size.Large">@message.Name.Substring(0, 1).ToUpper()</MudAvatar>
@@ -238,35 +233,28 @@
                                         <MudText Typo="Typo.body1">@message.Name</MudText>
                                         <MudText Typo="Typo.body2">Intended for: @message.IntendedFor</MudText>
                                     </CardHeaderContent>
-                                    
-                                    <CardHeaderActions>
-                                        @if(isUserInRole("Moderator"))
-                                        {
-                                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async () => await Delete(message.Id))" />
-                                        }
-                                        </CardHeaderActions>
-                                   
 
+                                    <CardHeaderActions>
+                                        @if (isUserInRole("Moderator"))
+                                        {
+                                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async () => await Delete(message.Id))" />
+                                        }
+                                    </CardHeaderActions>
                                 </MudCardHeader>
 
                                 <MudCardContent>
                                     <MudText Typo="Typo.body2">@message.Content</MudText>
-                                    <p style="padding:0px; margin-top:
-px; margin-bottom:0px;">@message.RepliesNumber replies</p>
+                                    <p style="padding:0px; margin-top:0px; margin-bottom:0px;">@message.RepliesNumber replies</p>
                                 </MudCardContent>
                                 <MudCardActions>
-                                    <MudIconButton Icon="@Icons.Material.Filled.Reply" Color="Color.Default" />
-                                    <p style="padding:0px; margin-top: 0px; margin-bottom:0px;">Reply</p>
-
-
-
+                                    <MudButton OnClick="() => NavigateToMessage(message.Id, true)">
+                                        <MudIconButton Icon="@Icons.Material.Filled.Reply" Color="Color.Default" />
+                                        <p style="padding:0px; margin-top: 0px; margin-bottom:0px;">Reply</p>
+                                    </MudButton>
                                 </MudCardActions>
                             </MudCard>
                         }
-
                     </div>
-
-
                 </div>
 
                 <div class="right-side">
@@ -281,11 +269,8 @@ px; margin-bottom:0px;">@message.RepliesNumber replies</p>
                         <p>Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos...</p>
                     </div>
                 </div>
-
             </div>
         </div>
-
-
     </Authorized>
     <NotAuthorized>
         <MudText Typo="Typo.h6">You are not authorized to view this page. Redirecting to login...</MudText>
@@ -296,31 +281,28 @@ px; margin-bottom:0px;">@message.RepliesNumber replies</p>
     [Inject] private NavigationManager NavigationManager { get; set; }
 
     private AuthenticationState authState;
-
     private List<MessageDto> messages = new List<MessageDto>();
     private bool isAuthorized = false;
     private System.Security.Claims.ClaimsPrincipal currentUser;
     private string userInitial = "";
-
     private string newMessageError = "";
-
     private MessageDtoPost message = new();
+
     private bool isUserInRole(string role)
     {
         return authState.User.IsInRole(role);
     }
+
     protected override async Task OnInitializedAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         currentUser = authState.User;
-
         isAuthorized = authState.User.Identity.IsAuthenticated;
         if (user.Identity.IsAuthenticated)
         {
             userInitial = user.Identity.Name.Substring(0, 1).ToUpper();
             await LoadMessages();
-
         }
         else
         {
@@ -386,7 +368,6 @@ px; margin-bottom:0px;">@message.RepliesNumber replies</p>
         message.IntendedFor = "Community";
         var result = await this.httpClient.PostAsJsonAsync($"/api/messages/{messageId}/reply", message);
 
-        // Your existing code here
         if (!result.IsSuccessStatusCode)
             newMessageError = await result.Content.ReadAsStringAsync();
         else
@@ -398,10 +379,15 @@ px; margin-bottom:0px;">@message.RepliesNumber replies</p>
         }
     }
 
-    private void NavigateToMessage(string messageId)
+    private void NavigateToMessage(string messageId, bool reply)
     {
-        NavigationManager.NavigateTo($"/message/{messageId}");
+        if (reply)
+        {
+            NavigationManager.NavigateTo($"/message/{messageId}?reply=true");
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/message/{messageId}");
+        }
     }
-}
-
 }
