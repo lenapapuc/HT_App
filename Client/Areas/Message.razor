@@ -17,7 +17,7 @@
                 </CardHeaderAvatar>
                 <CardHeaderContent>
                     <MudText Typo="Typo.body1">@message.Name</MudText>
-                    <MudText Typo="Typo.body2">Intended for: @message.IntendedFor</MudText>
+                    <MudText Typo="Typo.body2">@message.UserRole[0]</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
             
@@ -28,9 +28,7 @@
                 {
                     <div class="reply-section" style="display:flex; flex-direction: row;">
 
-                        <MudTextField @bind-Value=@replyContent Label="Răspuns" Variant="Variant.Outlined" AutoGrow>
-                          
-                                
+                        <MudTextField @bind-Value=@replyContent Label="Răspuns" Variant="Variant.Outlined" AutoGrow>                     
                             
                             </MudTextField>
 
@@ -42,10 +40,15 @@
                 }
             </MudCardContent>
            <MudCardActions>
-                                    <MudButton>
+
+                @if (!openReplyWindow)
+                {
+
+                    <MudButton OnClick="OpenReplyWindow">
                                         <MudIconButton Icon="@Icons.Material.Filled.Reply" Color="Color.Default" />
                                         <p style="padding:0px; margin-top: 0px; margin-bottom:0px;">Reply</p>
                                     </MudButton>
+                }
                                 </MudCardActions>
         </MudCard>
 
@@ -122,6 +125,13 @@
         {
             Snackbar.Add("Invalid message ID format.", Severity.Error);
         }
+    }
+
+    public async void OpenReplyWindow()
+    {
+        openReplyWindow = true;
+        StateHasChanged();
+
     }
 
     private async Task PostReply()

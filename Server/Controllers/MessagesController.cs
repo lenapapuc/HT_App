@@ -10,6 +10,7 @@ using System.Net;
 using System.Reflection.Metadata.Ecma335;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Duende.IdentityServer.Models;
 
 namespace Server.Controllers
 {
@@ -111,21 +112,34 @@ namespace Server.Controllers
         public async Task<List<MessageDto>> GetMessagesCommunity()
         {
             var messages = await _context.Messages.Include(m=>m.CreatedBy).Where(c => c.IntendedFor == "Community").ToListAsync();
+            var userIds = messages.Select(m => m.CreatedBy.Id).Distinct().ToList();
+            var userRoles = await _context.UserRoles
+        .Where(ur => userIds.Contains(ur.UserId))
+        .Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new { ur.UserId, r.Name })
+        .ToListAsync();
+            var userRolesDict = userRoles
+        .GroupBy(ur => ur.UserId)
+        .ToDictionary(g => g.Key, g => g.Select(ur => ur.Name).ToList());
             List<MessageDto> messageList = new List<MessageDto>();
             foreach (var message in messages)
             {
+                var roles = userRolesDict.ContainsKey(message.CreatedBy.Id) ? userRolesDict[message.CreatedBy.Id] : new List<string>();
+
                 MessageDto messageDto = new MessageDto
                 {
+
                     Id = message.Id.ToString(),
                     Content = message.Content,
                     IntendedFor = message.IntendedFor,
                     CreatedAt = message.CreatedDate,
                     UserId = message.CreatedBy.Id.ToString(),
-                    Name = message.CreatedBy.Name
+                    Name = message.CreatedBy.Name,
+                    UserRole = roles
                 };
 
                 messageList.Add(messageDto);
             }
+
 
             return messageList;
         }
@@ -183,8 +197,21 @@ namespace Server.Controllers
         [Route("{id}")]
         public async Task<MessageDto> GetMessageById(Guid id)
         {
-            var message = await _context.Messages.Include(x => x.CreatedBy).FirstOrDefaultAsync(m => m.Id == id);
-            if (message == null) throw new System.Web.Http.HttpResponseException(HttpStatusCode.NotFound); ;
+            var message = await _context.Messages
+                .Include(x => x.CreatedBy)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (message == null)
+            {
+                throw new System.Web.Http.HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var userId = message.CreatedBy.Id;
+            var userRoles = await _context.UserRoles
+                .Where(ur => ur.UserId == userId)
+                .Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => r.Name)
+                .ToListAsync();
+
             MessageDto messageDto = new MessageDto
             {
                 Id = message.Id.ToString(),
@@ -192,20 +219,19 @@ namespace Server.Controllers
                 IntendedFor = message.IntendedFor,
                 CreatedAt = message.CreatedDate,
                 UserId = message.CreatedBy.Id.ToString(),
-                Name = message.CreatedBy.Name
+                Name = message.CreatedBy.Name,
+                UserRole = userRoles
             };
 
-
             return messageDto;
-
         }
-
 
         [HttpDelete]
         [Route("{id}")]
         public async Task<IActionResult> DeleteMessageById(Guid id)
         {
             var message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == id);
+   
             if (message == null) throw new System.Web.Http.HttpResponseException(HttpStatusCode.NotFound); ;
             _context.Messages.Remove(message);
             await _context.SaveChangesAsync();

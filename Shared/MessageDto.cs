@@ -11,6 +11,6 @@
         public string Name { get; set; }
         public int RepliesNumber { get; set; }
 
-
+        public List<string>? UserRole { get; set; }
     }
 }
