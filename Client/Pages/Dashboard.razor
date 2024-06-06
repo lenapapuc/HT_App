@@ -230,8 +230,10 @@
                                         <MudAvatar Size="Size.Large">@message.Name.Substring(0, 1).ToUpper()</MudAvatar>
                                     </CardHeaderAvatar>
                                     <CardHeaderContent>
-                                        <MudText Typo="Typo.body1">@message.Name</MudText>
-                                        <MudText Typo="Typo.body2"> @message.UserRole[0]</MudText>
+                                        <MudText Typo="Typo.body1"><strong>@message.Name</strong></MudText>
+                                        @if(message.UserRole[0] != "User"){
+                                            <MudText Typo="Typo.body2"> @message.UserRole[0]</MudText>
+                                        }
                                     </CardHeaderContent>
 
                                     <CardHeaderActions>
