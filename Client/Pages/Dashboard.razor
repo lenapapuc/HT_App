@@ -228,6 +228,8 @@
                     <div class="messages">
                         @foreach (var message in messages.OrderByDescending(m => m.CreatedAt))
                         {
+                            @if(message.UserRole[0] == "User")
+                            {
                             <MudCard Style="margin-bottom: 10px;">
                                 <MudCardHeader @onclick="() => NavigateToUser(message.UserId)">
                                     <CardHeaderAvatar>
@@ -260,6 +262,7 @@
                                 </MudCardActions>
                             </MudCard>
                         }
+                        }
                     </div>
                 </div>
 
@@ -284,7 +287,7 @@
 </AuthorizeView>
 
 @code {
-        [Inject] private NavigationManager NavigationManager { get; set; }
+   [Inject] private NavigationManager NavigationManager { get; set; }
 
     private AuthenticationState authState;
     private List<MessageDto> messages = new List<MessageDto>();

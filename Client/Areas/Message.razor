@@ -11,7 +11,7 @@
     @if (message != null)
     {
         <MudCard>
-            <MudCardHeader>
+            <MudCardHeader @onclick="() => NavigateToUser(message.UserId)">
                 <CardHeaderAvatar>
                     <MudAvatar Size="Size.Large">@message.Name.Substring(0, 1).ToUpper()</MudAvatar>
                 </CardHeaderAvatar>
@@ -67,6 +67,7 @@
         background-color: #800000;
         color: white;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        cursor:pointer;
     }
 
     .mud-paper {
@@ -92,6 +93,18 @@
         flex-direction: column;
         align-items: center;
     }
+
+    .mud-card-header-content {
+        font-family: "Inter", sans-serif;
+        font-optical-sizing: inherit;
+        font-weight: 400;
+        font-size: 20px;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+        color: black;
+        cursor: pointer;
+    }
+
 </style>
 
 @code {
@@ -164,5 +177,10 @@
         {
             Snackbar.Add("Failed to post reply.", Severity.Error);
         }
+    }
+
+    private void NavigateToUser(string userId)
+    {
+        NavigationManager.NavigateTo($"/user/{userId}");
     }
 }
