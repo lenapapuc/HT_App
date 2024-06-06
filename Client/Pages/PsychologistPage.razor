@@ -1,0 +1,196 @@
+﻿@page "/dashboard/psychologist"
+@layout EmptyLayout
+@inherits LayoutComponentBase
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManger
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using Microsoft.AspNetCore.Identity;
+@using MudBlazor
+@using Domain
+@using System.Security.Claims;
+@using global::Shared
+@inject IJSRuntime JSRuntime
+@inject ISnackbar Snackbar
+@inject HttpClient httpClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<AuthorizeView Roles="Psychologist, Moderator">
+<div class="container">
+     <div class="side">
+         <p class="pap">CONȚINUT PENTRU PSIHOLOG</p>
+        <div class="messages">
+            @foreach (var message in messages.OrderByDescending(m => m.CreatedAt))
+            {
+               
+                    <MudCard Style="margin-bottom: 10px;">
+                        <MudCardHeader @onclick="() => NavigateToUser(message.UserId)">
+                            <CardHeaderAvatar>
+                                <MudAvatar Size="Size.Large" @onclick="() => NavigateToUser(message.UserId)">@message.Name.Substring(0, 1).ToUpper()</MudAvatar>
+                            </CardHeaderAvatar>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.body1"><strong>@message.Name</strong></MudText>
+                                @if (message.UserRole[0] != "User")
+                                {
+                                    <MudText Typo="Typo.body2"> @message.UserRole[0]</MudText>
+                                }
+                            </CardHeaderContent>
+
+                            <CardHeaderActions>
+                                @if (isUserInRole("Moderator"))
+                                {
+                                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async () => await Delete(message.Id))" />
+                                }
+                            </CardHeaderActions>
+                        </MudCardHeader>
+
+                        <MudCardContent @onclick="() => NavigateToMessage(message.Id, false)">
+                            <MudText Typo="Typo.body2">@message.Content</MudText>
+                            <p style="padding:0px; margin-top:0px; margin-bottom:0px;">@message.RepliesNumber replies</p>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton OnClick="() => NavigateToMessage(message.Id, true)">
+                                <MudIconButton Icon="@Icons.Material.Filled.Reply" Color="Color.Default" />
+                                <p style="padding:0px; margin-top: 0px; margin-bottom:0px;">Reply</p>
+                            </MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                
+            }
+            </div>
+
+     </div>
+     </div>
+</AuthorizeView>
+
+
+ <style>
+     .container
+
+     {
+         display: flex;
+         justify-content:center;
+     }
+
+
+    .side {
+        width: 70%;
+       
+        background-color: #D9D9D9;
+        max-height: 100vh;
+        height: 100vh;
+        overflow-y: scroll;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+
+    }
+
+    .pap
+    {
+            font-family: "Inter", sans-serif;
+            font-optical-sizing: inherit;
+            font-weight: 800;
+            font-size: 35px;
+            font-style: normal;
+            font-variation-settings: "slnt" 0;
+            color: black;
+    }
+
+    .mud-paper {
+        border-bottom: 1px solid #e0e0e0;
+        background-color: #D9D9D9;
+        box-shadow: 0;
+        width: 70%;
+    }
+
+    .messages
+    {
+        width: inherit;
+    }
+
+ </style>
+@code {
+    [Inject] private NavigationManager NavigationManager { get; set; }
+
+    private AuthenticationState authState;
+    private List<MessageDto> messages = new List<MessageDto>();
+    private bool isAuthorized = false;
+    private System.Security.Claims.ClaimsPrincipal currentUser;
+    private string userInitial = "";
+    private string newMessageError = "";
+    private MessageDtoPost message = new();
+
+    private bool isUserInRole(string role)
+    {
+        return authState.User.IsInRole(role);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        currentUser = authState.User;
+        isAuthorized = authState.User.Identity.IsAuthenticated;
+        if (user.Identity.IsAuthenticated)
+        {
+            userInitial = user.Identity.Name.Substring(0, 1).ToUpper();
+            await LoadMessages();
+        }
+        else
+        {
+            await Task.Delay(3000);
+            NavigationManager.NavigateTo("Identity/Account/Login");
+        }
+    }
+
+    private async Task LoadMessages()
+    {
+        messages = await httpClient.GetFromJsonAsync<List<MessageDto>>("/api/messages/psychologist");
+        messages = messages.OrderByDescending(m => m.CreatedAt).ToList();
+        StateHasChanged(); // Refresh the UI after loading messages
+    }
+
+    private void NavigateToMessage(string messageId, bool reply)
+    {
+        if (reply)
+        {
+            NavigationManager.NavigateTo($"/message/{messageId}?reply=true");
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/message/{messageId}");
+        }
+    }
+
+    private void NavigateToUser(string userId)
+    {
+        NavigationManager.NavigateTo($"/user/{userId}");
+    }
+    private async Task Delete(string id)
+    {
+        if (Guid.TryParse(id, out Guid guidId))
+        {
+            var response = await httpClient.DeleteAsync($"/api/messages/{guidId}");
+            if (response.IsSuccessStatusCode)
+            {
+                messages.RemoveAll(m => m.Id == id);
+                Snackbar.Add("Message deleted successfully.", Severity.Success);
+                StateHasChanged();
+            }
+            else
+            {
+                Snackbar.Add("Failed to delete the message.", Severity.Error);
+            }
+        }
+        else
+        {
+            Snackbar.Add("Invalid message ID.", Severity.Error);
+        }
+    }
+
+}
