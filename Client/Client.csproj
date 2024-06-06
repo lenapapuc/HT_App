@@ -11,6 +11,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\logo.webp" />
+    <Content Remove="wwwroot\moldova.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\logo.webp" />
+    <None Include="wwwroot\moldova.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNet.Cors" Version="5.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.18" />
