@@ -39,7 +39,6 @@
                 <p style="padding:0px; margin-top:0px; margin-bottom:0px; cursor:pointer;" @onclick="() => ShowReplies(message.Id)">@message.RepliesNumber replies</p>
 
 
-               <ReplyComponent MessageId="@message.Id" ShowReplies="@showReplies" OnClose="HideReplies" />
 
                 @if (openReplyWindow)
                 {
@@ -66,7 +65,11 @@
                                         <p style="padding:0px; margin-top: 0px; margin-bottom:0px;">Reply</p>
                                     </MudButton>
                 }
+                
+
                                 </MudCardActions>
+            <ReplyComponent MessageId="@message.Id" ShowReplies="@showReplies" OnClose="HideReplies" />
+
         </MudCard>
 
     }
@@ -87,6 +90,9 @@
     .mud-paper {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         width: 50%;
+        height: fit-content;
+        max-height: 100vh;
+        overflow-y: scroll;
     }
 
     .message-details {
