@@ -36,8 +36,21 @@
 
     <script src="_framework/blazor.server.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
-   
-
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        window.blazorFillContainerWithHtml = (container, html) => {
+            container.innerHTML = html;
+        };
+    </script>
+    <script>
+        async function fetch(url) {
+            const response = await window.fetch(url);
+            return {
+                text: () => response.text()
+            };
+        }
+    </script>
     
 
 

@@ -1,0 +1,92 @@
+﻿@page "/map"
+
+@layout EmptyLayout
+
+@using MudBlazor
+@using Domain
+@using global::Shared
+@inject IJSRuntime JSRuntime
+@inject ISnackbar Snackbar
+@inject HttpClient httpClient
+
+@inject IDialogService DialogService
+
+<MudGrid>
+    <MudItem xs="6">
+        <MudCard Class="card">
+            <MudCardContent>
+                <MudText Typo="Typo.h6">Map</MudText>
+                @if (!string.IsNullOrEmpty(MapSvgContent))
+                {
+                    <div @key="MapSvgContent" @onclick="ShowRegionData">
+                        @((MarkupString)MapSvgContent)
+                    </div>
+                }
+                else
+                {
+                    <MudText>Loading map...</MudText>
+                }
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="6">
+        <MudCard Class="card">
+            <MudCardContent>
+                <MudText Typo="Typo.h6">Statistics</MudText>
+                <!-- Display statistics here -->
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private string MapSvgContent { get; set; } = string.Empty;
+
+    private async Task InitializeMap()
+    {
+        try
+        {
+            var svgPath = "md.svg";
+            MapSvgContent = await httpClient.GetStringAsync(svgPath);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error fetching SVG: {ex.Message}");
+        }
+        StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await InitializeMap();
+        }
+    }
+
+    private void ShowRegionData(MouseEventArgs e)
+    {
+        var regionName = GetRegionNameFromEvent(e);
+        var victimCount = regionName switch
+        {
+            "Chisinau" => 65,
+            "Soroca" => 20,
+            "Balti" => 35,
+            _ => 0
+        };
+        Snackbar.Add($"{regionName} - {victimCount} victims", Severity.Info);
+    }
+
+    private string GetRegionNameFromEvent(MouseEventArgs e)
+    {
+        // Implement logic to determine the region name based on mouse event coordinates or other criteria
+        var x = e.ClientX;
+        var y = e.ClientY;
+
+        if (x < 200 && y < 200) return "Chisinau";
+        if (x >= 200 && y < 200) return "Soroca";
+        if (x < 200 && y >= 200) return "Balti";
+
+        return "Unknown";
+    }
+}

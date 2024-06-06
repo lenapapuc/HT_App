@@ -16,16 +16,16 @@
     <MudItem xs="2" Class="sidebar">
         <MudCard Class="logo-card">
             <MudCardContent Class="logo-content">
-                <MudText Typo="Typo.h5">Logo</MudText>
+                <MudImage Src="logo.webp" Alt="Webpage Logo" Elevation="0" Class="rounded-lg logo-image" />
             </MudCardContent>
         </MudCard>
         <MudNavMenu Class="nav-menu">
-            <MudNavLink Href="#"><MudText Typo="Typo.body1">HT app</MudText></MudNavLink>
-            <MudNavLink Href="#"><MudText Typo="Typo.body1">Charts</MudText></MudNavLink>
+            <MudNavLink @onclick="NavigateToCharts"><MudText Typo="Typo.body1">Charts</MudText></MudNavLink>
             <MudNavLink Href="#"><MudText Typo="Typo.body1">Quizzes</MudText></MudNavLink>
-             <MudNavLink Href="#"><MudText Typo="Typo.body1">News</MudText></MudNavLink>
+            <MudNavLink Href="#"><MudText Typo="Typo.body1">News</MudText></MudNavLink>
             <MudNavLink Href="#"><MudText Typo="Typo.body1">Map</MudText></MudNavLink>
             <MudNavLink Href="#"><MudText Typo="Typo.body1">Donation</MudText></MudNavLink>
+            <MudNavLink Href="#"><MudText Typo="Typo.body1">Forum</MudText></MudNavLink>
         </MudNavMenu>
     </MudItem>
     <MudItem xs="10" Class="content">
@@ -35,23 +35,23 @@
                     <MudItem xs="12">
                         <MudCard Class="card">
                             <MudCardContent>
-                                <MudText Typo="Typo.h6">Charts</MudText>
+                                <MudText Typo="Typo.h6">Numărul de cazuri anual</MudText>
                                 <div @onclick="NavigateToCharts" style="cursor: pointer;">
-                                <MudChart ChartType="ChartType.Donut" Width="250px" Height="250px" InputData="@data" InputLabels="@labels">
-                                    <CustomGraphics>
-                                        <text class="donut-inner-text" x="47%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">Total</text>
-                                        <text class="donut-inner-text" x="47%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@data.Sum().ToString()</text>
-                                    </CustomGraphics>
-                                </MudChart>
+                                    <MudChart ChartType="ChartType.Donut" Width="250px" Height="250px" InputData="@data" InputLabels="@labels">
+                                        <CustomGraphics>
+                                            <text class="donut-inner-text" x="47%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">Total</text>
+                                            <text class="donut-inner-text" x="47%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@data.Sum().ToString()</text>
+                                        </CustomGraphics>
+                                    </MudChart>
                                 </div>
                             </MudCardContent>
                         </MudCard>
                     </MudItem>
-                    <MudItem xs="12">
+                    <MudItem xs="12" Class="quizzes">
                         <MudCard Class="card">
                             <MudCardContent>
-                                <MudText Typo="Typo.h6">Quizzes</MudText>
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="background-color: #673ab7;">Start Quiz</MudButton>
+                                <MudText Typo="Typo.h6" Class="card-title">Testeazăți cunoștințele</MudText>
+                                <MudButton Class="start-quiz-button" Variant="Variant.Filled" Color="Color.Primary">Start Quiz</MudButton>
                             </MudCardContent>
                         </MudCard>
                     </MudItem>
@@ -60,8 +60,19 @@
             <MudItem xs="4">
                 <MudCard Class="card">
                     <MudCardContent>
-                        <MudText Typo="Typo.h6">News list</MudText>
-                        <!-- Add News List Content Here -->
+                        <MudText Typo="Typo.h6" Class="card-title">Noutăți</MudText>
+                        <ul class="news-list">
+                            @foreach (var news in newsItems.OrderByDescending(n => n.Date))
+                            {
+                                <li>
+                                    <MudText Typo="Typo.body2">
+                                        <a href="@news.Link" target="_blank">@news.Title</a>
+                                        <br />
+                                        <span class="news-date">@news.Date.ToString("dd.MM.yyyy") <MudIcon Icon="@Icons.Material.Filled.Edit" Size="Size.Small" /></span>
+                                    </MudText>
+                                </li>
+                            }
+                        </ul>
                     </MudCardContent>
                 </MudCard>
             </MudItem>
@@ -69,9 +80,10 @@
                 <MudGrid>
                     <MudItem xs="12">
                         <MudCard Class="card">
-                            <MudCardContent>
-                                <MudText Typo="Typo.h6">Map</MudText>
-                                <!-- Add Map Content Here -->
+                            <MudCardContent>                           
+                                <MudText Typo="Typo.h6">Harta Republicii Moldova</MudText>
+                                <MudImage Src="map_md.webp" Alt="Interactive Map" Class="inter_map" />
+                                <MudButton @onclick="NavigateToMap" Variant="Variant.Filled" Color="Color.Primary">Intercționează cu harta</MudButton>
                             </MudCardContent>
                         </MudCard>
                     </MudItem>
@@ -103,12 +115,17 @@
     }
 
     .sidebar {
-        background: linear-gradient(to bottom, #3f51b5, #673ab7);
+        background-color: #800000; /* Match the footer and header color */
         color: white;
         padding: 20px;
-        height: calc(100vh - 3.5rem); /* Ensure it covers the entire height minus header */
-        border-radius: 0 0 0 0; /* Rounded corners for the sidebar */
+        height: calc(100vh - 3.4rem); /* Ensure it covers the entire height minus header */
+        border-radius: 0; /* Rounded corners for the sidebar */
         margin-top: -1px;
+    }
+
+    .logo-image {
+        width: 80px;
+        height: auto;
     }
 
     .logo-card {
@@ -127,24 +144,23 @@
         margin-top: 10px;
     }
 
-    .nav-menu a {
-        color: white;
-        text-decoration: none;
-        display: block;
-        padding: 10px 0;
-    }
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px 0;
+        }
 
-    .nav-menu a:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
+            .nav-menu a:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
 
     .content {
         padding: 0;
         background-color: #f5f5f5;
-
     }
 
-    .top-row{
+    .top-row {
         margin-bottom: 0;
     }
 
@@ -162,8 +178,48 @@
         color: white;
     }
 
-    .mud-button-filled:hover {
-        background-color: #5e35b1; /* Slightly darker for hover effect */
+        .mud-button-filled:hover {
+            background-color: #5e35b1; /* Slightly darker for hover effect */
+        }
+
+    .start-quiz-button {
+        margin-top: 26px; /* Add space between the text and button */
+    }
+
+    .card-title {
+        color: #800000; /* Match the header and footer color */
+    }
+
+    .news-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        max-height: 476px; /* Adjust as necessary */
+        overflow-y: auto;
+    }
+
+        .news-list li {
+            margin-bottom: 15px; /* Space between news items */
+        }
+
+    .news-date {
+        color: #800000; /* Match the "Noutăți" color */
+        display: flex;
+        align-items: center;
+    }
+
+        .news-date .mud-icon-root {
+            margin-left: 5px;
+        }
+
+    .map-image {
+        width: 100%; /* Adjust as needed */
+        height: auto;
+    }
+
+    .inter_map {
+        width: 250px;
+        height: auto;
     }
 </style>
 
@@ -176,5 +232,63 @@
     private void NavigateToCharts()
     {
         Navigation.NavigateTo("/charts");
+    }
+
+    private List<NewsItem> newsItems = new List<NewsItem>
+    {
+        new NewsItem
+        {
+            Title = "Consolidarea capacităților profesionale ale inspectorilor de muncă",
+            Link = "https://www.antitrafic.gov.md/libview.php?l=ro&idc=94&id=1461&t=/Presa/Stiri-si-Evenimente/Consolidarea-capacitatilor-profesionale-ale-inspectorilor-de-munca",
+            Date = new DateTime(2024, 04, 29)
+        },
+        new NewsItem
+        {
+            Title = "Instruire a agenților economici privind angajarea pe teritoriul Republicii Moldova a cetățenilor străini",
+            Link = "https://www.antitrafic.gov.md/libview.php?l=ro&idc=94&id=1460&t=/Presa/Stiri-si-Evenimente/Instruire-a-agentilor-economici-privind-angajarea-pe-teritoriul-Republicii-Moldova-a-cetatenilor-straini",
+            Date = new DateTime(2024, 04, 25)
+        },
+        new NewsItem
+        {
+            Title = "Atelier de lucru privind gestionarea cazurilor de trafic de ființe umane a cetățenilor străini",
+            Link = "https://www.antitrafic.gov.md/libview.php?l=ro&idc=94&id=1459&t=/Presa/Stiri-si-Evenimente/Atelier-de-lucru-privind-gestionarea-cazurilor-de-trafic-de-fiinte-umane-a-cetatenilor-straini",
+            Date = new DateTime(2024, 04, 16)
+        },
+        new NewsItem
+        {
+            Title = "Ședința Grupului operativ de lucru privind traficul de ființe umane",
+            Link = "https://www.antitrafic.gov.md/libview.php?l=ro&idc=94&id=1458&t=/Presa/Stiri-si-Evenimente/edinta-Grupului-operativ-de-lucru-privind-traficul-de-fiinte-umane",
+            Date = new DateTime(2024, 04, 01)
+        },
+        new NewsItem
+        {
+            Title = "Aflați cum întărește UE normele împotriva traficului de ființe umane pentru a răspunde schimbărilor în modalitățile de exploatare a persoanelor.",
+            Link = "https://www.europarl.europa.eu/topics/ro/article/20230921STO05705/traficul-de-fiinte-umane-lupta-ue-impotriva-exploatarii",
+            Date = new DateTime(2023, 11, 14)
+        },
+         new NewsItem
+        {
+            Title = "Ședința Grupului operativ de lucru privind traficul de ființe umane",
+            Link = "https://www.antitrafic.gov.md/libview.php?l=ro&idc=94&id=1453&t=/Presa/Stiri-si-Evenimente/edinta-Grupului-operativ-de-lucru-privind-traficul-de-fiinte-umane",
+            Date = new DateTime(2023, 12, 20)
+        },
+        new NewsItem
+        {
+            Title = "Campania BeSafe (OSCE & Thomson Reuters)",
+            Link = "https://www.antitrafic.gov.md/libview.php?l=ro&idc=94&id=1445&t=/Presa/Stiri-si-Evenimente/Campania-BeSafe-OSCE-Thomson-Reuters",
+            Date = new DateTime(2023, 07, 31)
+        }           
+    };
+
+    public class NewsItem
+    {
+        public string Title { get; set; }
+        public string Link { get; set; }
+        public DateTime Date { get; set; }
+    }
+
+    private void NavigateToMap()
+    {
+        Navigation.NavigateTo("/map");
     }
 }
