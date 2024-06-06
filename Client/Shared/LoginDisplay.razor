@@ -2,19 +2,19 @@
     <Authorized Context="userContext">
         <UserDisplay />
         <form method="post" action="Identity/Account/Logout">
-            <button style="color:white; " type="submit" class="nav-link btn btn-link">Log out</button>
+            <button style="color:white; margin-left:10px; " type="submit" class="nav-link btn btn-link">Log out</button>
         </form>
          <AuthorizeView Roles="Admin">
             <Authorized Context="adminContext">
-                <a href="Identity/Account/Register">Register</a>
+                <a style="color:white;" href="Identity/Account/Register">Register</a>
 
             </Authorized>
 
         </AuthorizeView>
     </Authorized>
     <NotAuthorized>
-        <a href="Identity/Account/Register">Register</a>
-        <a href="Identity/Account/Login">Log in</a>
+        <a href="Identity/Account/Register" style="color:white; margin-left:10px; margin-right:10px;">Register</a>
+        <a href="Identity/Account/Login" style="color:white;margin-left:10px; margin-right:10px;">Log in</a>
     </NotAuthorized>
     
 </AuthorizeView>

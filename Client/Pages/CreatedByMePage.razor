@@ -1,4 +1,4 @@
-﻿@page "/dashboard/psychologist"
+﻿@page "/messages/user/{userId}"
 @layout EmptyLayout
 @inherits LayoutComponentBase
 @inject UserManager<ApplicationUser> UserManager
@@ -14,14 +14,14 @@
 @inject HttpClient httpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<AuthorizeView Roles="Psychologist, Moderator">
-<div class="container">
-     <div class="side">
-         <p class="pap">CONȚINUT PENTRU PSIHOLOG</p>
-        <div class="messages">
-            @foreach (var message in messages.OrderByDescending(m => m.CreatedAt))
-            {
-               
+<AuthorizeView>
+    <div class="container">
+        <div class="side">
+            <p class="pap">CONȚINUT CREAT DE MINE</p>
+            <div class="messages">
+                @foreach (var message in messages.OrderByDescending(m => m.CreatedAt))
+                {
+
                     <MudCard Style="margin-bottom: 10px;">
                         <MudCardHeader @onclick="() => NavigateToUser(message.UserId)">
                             <CardHeaderAvatar>
@@ -29,10 +29,9 @@
                             </CardHeaderAvatar>
                             <CardHeaderContent>
                                 <MudText Typo="Typo.body1"><strong>@message.Name</strong></MudText>
-                                @if (message.UserRole[0] != "User")
-                                {
-                                    <MudText Typo="Typo.body2"> @message.UserRole[0]</MudText>
-                                }
+                               
+                                    <MudText Typo="Typo.body2"> Creat pentru @message.IntendedFor</MudText>
+                                
                             </CardHeaderContent>
 
                             <CardHeaderActions>
@@ -54,27 +53,24 @@
                             </MudButton>
                         </MudCardActions>
                     </MudCard>
-                
-            }
+
+                }
             </div>
 
-     </div>
-     </div>
+        </div>
+    </div>
 </AuthorizeView>
 
 
- <style>
-     .container
-
-     {
-         display: flex;
-         justify-content:center;
-     }
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+    }
 
 
     .side {
         width: 70%;
-       
         background-color: #D9D9D9;
         max-height: 100vh;
         height: 100vh;
@@ -87,18 +83,16 @@
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         margin-bottom: 20px;
-
     }
 
-    .pap
-    {
-            font-family: "Inter", sans-serif;
-            font-optical-sizing: inherit;
-            font-weight: 800;
-            font-size: 35px;
-            font-style: normal;
-            font-variation-settings: "slnt" 0;
-            color: black;
+    .pap {
+        font-family: "Inter", sans-serif;
+        font-optical-sizing: inherit;
+        font-weight: 800;
+        font-size: 35px;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
+        color: black;
     }
 
     .mud-paper {
@@ -106,15 +100,13 @@
         background-color: #D9D9D9;
         box-shadow: 0;
         width: 100%;
-        
     }
 
-    .messages
-    {
+    .messages {
         width: inherit;
         display: flex;
         flex-direction: column;
-        align-items:center;
+        align-items: center;
     }
 
     .mud-avatar.mud-avatar-large {
@@ -124,10 +116,11 @@
         cursor: pointer;
     }
 
-
- </style>
+</style>
 @code {
     [Inject] private NavigationManager NavigationManager { get; set; }
+    [Parameter] public string userId { get; set; }
+
 
     private AuthenticationState authState;
     private List<MessageDto> messages = new List<MessageDto>();
@@ -162,7 +155,7 @@
 
     private async Task LoadMessages()
     {
-        messages = await httpClient.GetFromJsonAsync<List<MessageDto>>("/api/messages/psychologist");
+        messages = await httpClient.GetFromJsonAsync<List<MessageDto>>($"/api/messages/user/{userId}");
         messages = messages.OrderByDescending(m => m.CreatedAt).ToList();
         StateHasChanged(); // Refresh the UI after loading messages
     }

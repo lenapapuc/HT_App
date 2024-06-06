@@ -11,6 +11,7 @@
 
 
 <AuthorizeView Roles="Moderator">
+    <Authorized>
 @if (userDto != null)
 {
     <div class ="container" style="margin-left: 50px; ">
@@ -36,7 +37,12 @@
 
         </div>
     }
+    </Authorized>
+    <NotAuthorized>
+        Nu poți vedea date despre alți utilizatori
+    </NotAuthorized>
 </AuthorizeView>
+
 
 <style>
     .container button 
@@ -152,6 +158,5 @@
         }
     }
 
-}
 
 }
