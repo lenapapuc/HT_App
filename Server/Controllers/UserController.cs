@@ -25,14 +25,11 @@ namespace Server.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ActionResult<UserDto>> GetUserById(Guid id)
+        public async Task<UserDto> GetUserById(Guid id)
         {
             var user = await _userManager.FindByIdAsync(id.ToString());
 
-            if (user == null)
-            {
-                return NotFound();
-            }
+           
             var roles = await _userManager.GetRolesAsync(user);
 
 
@@ -40,10 +37,57 @@ namespace Server.Controllers
             {
                 Name = user.Name,
                 Strikes = user.Strikes,
-                Role = roles[0]
+                Role = roles[0],
+                UserId = id.ToString()
             };
 
-            return Ok(userDto);
+            return userDto;
         }
+
+        [HttpPut]
+        [Route("strike/{id}")]
+        public async Task<IActionResult> StrikeUser(Guid id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.Strikes += 1; // Increment the strikes
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+
+            return BadRequest(result.Errors);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(Guid id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+            {
+                return NotFound();
+            }
+            var message = await _context.Messages.Where(m=>m.CreatedBy.Id == id).ToListAsync();
+
+            if (message == null) throw new System.Web.Http.HttpResponseException(HttpStatusCode.NotFound); 
+            foreach(var item in message) { _context.Messages.Remove(item); }
+            
+           
+
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                return NoContent(); // HTTP 204 No Content
+            }
+
+            return BadRequest(result.Errors);
+        }
+
     }
 }

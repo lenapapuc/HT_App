@@ -1,0 +1,22 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudSelect T="string" Label="Alege motiv:" @bind-Value="Reason" Variant="Variant.Outlined" FullWidth="true">
+            <MudSelectItem Value=@("Motiv 1")>Motiv 1</MudSelectItem>
+            <MudSelectItem Value=@("Motiv 2")>Motiv 2</MudSelectItem>
+            <MudSelectItem Value=@("Motiv 3")>Motiv 3</MudSelectItem>
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Anulează</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private string Reason { get; set; } = "Motiv 1"; // Default reason
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(Reason));
+    void Cancel() => MudDialog.Cancel();
+}

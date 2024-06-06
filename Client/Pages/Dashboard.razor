@@ -110,12 +110,14 @@
 
     .mud-avatar-filled.mud-avatar-filled-primary {
         background-color: #800000;
+        cursor: pointer;
     }
 
     .mud-avatar-filled {
         background-color: #800000;
         color: white;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
     }
 
     .messages {
@@ -156,6 +158,8 @@
         font-style: normal;
         font-variation-settings: "slnt" 0;
         color: black;
+        cursor: pointer;
+
     }
 
 
@@ -224,12 +228,12 @@
                     <div class="messages">
                         @foreach (var message in messages.OrderByDescending(m => m.CreatedAt))
                         {
-                            <MudCard Style="margin-bottom: 10px;" @onclick="() => NavigateToMessage(message.Id, false)">
-                                <MudCardHeader>
+                            <MudCard Style="margin-bottom: 10px;">
+                                <MudCardHeader @onclick="() => NavigateToUser(message.UserId)">
                                     <CardHeaderAvatar>
-                                        <MudAvatar Size="Size.Large">@message.Name.Substring(0, 1).ToUpper()</MudAvatar>
+                                        <MudAvatar Size="Size.Large" @onclick="() => NavigateToUser(message.UserId)">@message.Name.Substring(0, 1).ToUpper()</MudAvatar>
                                     </CardHeaderAvatar>
-                                    <CardHeaderContent>
+                                    <CardHeaderContent >
                                         <MudText Typo="Typo.body1"><strong>@message.Name</strong></MudText>
                                         @if(message.UserRole[0] != "User"){
                                             <MudText Typo="Typo.body2"> @message.UserRole[0]</MudText>
@@ -244,7 +248,7 @@
                                     </CardHeaderActions>
                                 </MudCardHeader>
 
-                                <MudCardContent>
+                                <MudCardContent @onclick="() => NavigateToMessage(message.Id, false)">
                                     <MudText Typo="Typo.body2">@message.Content</MudText>
                                     <p style="padding:0px; margin-top:0px; margin-bottom:0px;">@message.RepliesNumber replies</p>
                                 </MudCardContent>
@@ -280,7 +284,7 @@
 </AuthorizeView>
 
 @code {
-    [Inject] private NavigationManager NavigationManager { get; set; }
+        [Inject] private NavigationManager NavigationManager { get; set; }
 
     private AuthenticationState authState;
     private List<MessageDto> messages = new List<MessageDto>();
@@ -391,5 +395,10 @@
         {
             NavigationManager.NavigateTo($"/message/{messageId}");
         }
+    }
+
+    private void NavigateToUser(string userId)
+    {
+        NavigationManager.NavigateTo($"/user/{userId}");
     }
 }

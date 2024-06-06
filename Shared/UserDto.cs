@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace Shared
 {
-    internal class UserDto
+    public class UserDto
     {
+        public DateTime? DateCreated {  get; set; }
+        public string Name { get; set; }
+        public int Strikes {  get; set; }
+        public string Role { get; set; }
+        public string UserId { get; set; }
     }
 }

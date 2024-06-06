@@ -1,0 +1,157 @@
+﻿@page "/user/{userId}"
+@using global::Shared;
+@layout EmptyLayout
+@inject ISnackbar Snackbar
+@inject HttpClient httpClient
+@inject NavigationManager NavigationManager
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IDialogService DialogService
+@inject IJSRuntime JSRuntime
+
+
+
+<AuthorizeView Roles="Moderator">
+@if (userDto != null)
+{
+    <div class ="container" style="margin-left: 50px; ">
+        <h3 style="margin-bottom: 20px;">Pagina utilizatorului @userDto.Name</h3>
+        <div class="user_data">
+                <p><span style="font-weight: 800;">User Name:</span> @userDto.Name</p>
+            <p><span style="font-weight: 800;">Strikes:</span> @userDto.Strikes</p>
+            <p><span style="font-weight: 800;">Rol:</span> @userDto.Role</p>
+        
+
+        </div>
+            @if (userDto.Role == "User")
+            {
+                <MudButton Size="Size.Large" OnClick="OpenStrikeDialog">Strike</MudButton>
+            }
+        </div>
+    }
+    else
+    {
+        <div class ="container" style="margin-left: 50px; ">
+        <h3>Acest utilizator nu există</h3>
+        
+
+        </div>
+    }
+</AuthorizeView>
+
+<style>
+    .container button 
+    {
+            background-color: #800000;
+            color: white;
+    }
+    .container{
+            font-family: "Inter", sans-serif;
+            top: 0;
+            font-weight: 400;
+            font-size: 20px;
+            font-style: normal;
+            font-variation-settings: "slnt" 0;
+            color: black;
+            height: inherit;
+    }
+</style>
+
+
+@code {
+    [Parameter] public string userId { get; set; }
+    private UserDto userDto { get; set; }
+    private string selectedReason { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUser();
+    }
+
+    private async Task LoadUser()
+    {
+        if (Guid.TryParse(userId, out var parsedUserId))
+        {
+            try
+            {
+                userDto = await httpClient.GetFromJsonAsync<UserDto>($"/api/user/{parsedUserId}");
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error loading message: {ex.Message}", Severity.Error);
+            }
+        }
+        else
+        {
+            Snackbar.Add("Invalid message ID format.", Severity.Error);
+        }
+    }
+
+    private async Task StrikeUser(string id)
+    {
+        try
+        {
+            var response = await httpClient.PutAsync($"/api/user/strike/{id}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                userDto.Strikes += 1;
+                Snackbar.Add("User has been struck.", Severity.Success);
+                if (userDto.Strikes >= 3)
+                {
+                    await DeleteUser(id);
+                }
+            }
+            else
+            {
+                Snackbar.Add("Failed to strike user.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error striking user: {ex.Message}", Severity.Error);
+        }
+
+    }
+    private async Task OpenStrikeDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var dialog = DialogService.Show<StrikeReasonDialog>("Motiv pentru avertisment", options);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            selectedReason = result.Data as string;
+            await JSRuntime.InvokeVoidAsync("alert", $"Utilizatorul a fost avertizat pentru motivul: {selectedReason}");
+
+          
+        }
+        await StrikeUser(userDto.UserId);
+
+
+    }
+
+    private async Task DeleteUser(string id)
+    {
+        try
+        {
+            var response = await httpClient.DeleteAsync($"/api/user/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Utilizatorul a fost șters din cauza la 3 avertizări");
+
+                NavigationManager.NavigateTo("/dashboard"); // Redirect to a different page
+            }
+            else
+            {
+                Snackbar.Add("Failed to delete user.", Severity.Error);
+            }       
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error deleting user: {ex.Message}", Severity.Error);
+        }
+    }
+
+}
+
+}
