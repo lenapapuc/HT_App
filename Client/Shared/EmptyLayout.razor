@@ -1,4 +1,18 @@
 ﻿@inherits LayoutComponentBase
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManger
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using Microsoft.AspNetCore.Identity;
+@using MudBlazor
+@using Domain
+@using System.Security.Claims;
+@using global::Shared
+@inject IJSRuntime JSRuntime
+@inject ISnackbar Snackbar
+@inject HttpClient httpClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using Microsoft.AspNetCore.Components.Authorization
+
 <MudThemeProvider />
 <MudDialogProvider />
 
@@ -130,6 +144,19 @@
         margin-bottom: 20px; /* Remove bottom margin */
     }
 
+
+    .top-row button{
+        background-color: #800000;
+       color: white;
+    
+       
+        margin-left:10px;
+         margin-right: 10px;
+        padding: 0px;
+     
+   
+    }
+
     .root {
         font-family: "Inter", sans-serif;
         font-weight: 800;
@@ -144,8 +171,17 @@
 
 <div class="main">
     <div class="top-row">
+
         <button class="root" @onclick="NavigateToRoot">HT_App</button>
-        <div style="display:flex; padding-bottom:0px;"> <LoginDisplay /></div>
+        <div class="end" style="display:flex; align-content: space-between; ">
+            @if (@isAuthorized)
+            {
+                <MudButton OnClick=" NavigateToUserMessage">Mesajele mele</MudButton>
+            }
+            <div style="display:flex; padding-bottom:0px;"> <LoginDisplay /></div>
+        </div>
+     
+       
     </div>
     <div class="content">
         @Body
@@ -186,11 +222,26 @@
 
 @code {
     [Inject] private NavigationManager NavigationManager { get; set; }
+    private System.Security.Claims.ClaimsPrincipal currentUser;
+    private AuthenticationState authState;
+    private List<MessageDto> messages = new List<MessageDto>();
+    private bool isAuthorized = false;
+    private string userInitial = "";
+    private string newMessageError = "";
+    private MessageDtoPost message = new();
     private void NavigateToRoot()
     {
-        NavigationManager.NavigateTo("/landing");
+        NavigationManager.NavigateTo("/");
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        currentUser = authState.User;
+        isAuthorized = authState.User.Identity.IsAuthenticated;
+       
+    }
     MudTheme MyCustomTheme = new MudTheme()
         {
             Typography = new Typography()
@@ -205,4 +256,12 @@
                 }
             }
         };
+
+    private void NavigateToUserMessage()
+    {
+        var userId = currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        NavigationManager.NavigateTo($"/messages/user/{userId}");
+    }
+
 }

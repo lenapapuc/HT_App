@@ -199,6 +199,33 @@
         align-items: center;
     }
 
+    .bottom-tabs {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        background-color: #fff;
+        padding: 10px 0;
+        box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .bottom-tab {
+        flex: 1;
+        text-align: center;
+        padding: 10px;
+        cursor: pointer;
+    }
+
+        .bottom-tab:hover {
+            background-color: #f0f0f0;
+        }
+
+        .bottom-tab.active {
+            font-weight: bold;
+            border-top: 2px solid #007BFF;
+        }
 </style>
 <AuthorizeView>
     <Authorized>
@@ -207,6 +234,7 @@
             <div class="sides">
                 <div class="left-side">
                     <h1 class="inter-message">DISCUȚII FORUM</h1>
+                    
 
                     <button class="dialogue" @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
                         <div style="width:30%; height: inherit; display:flex; justify-content:center; align-items:center">
@@ -271,23 +299,51 @@
                         <p>CONȚINUT CREAT DE MODERATORI ȘI PSIHOLOGI</p>
                     </div>
                     <div style="text-decoration: underline;" class="posts">
-                        <!-- Add some example content here -->
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam...</p>
-                        <p>Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris...</p>
-                        <p>Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla..  .</p>
-                        <p>Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos...</p>
+                        @foreach (var message in messages.OrderByDescending(m => m.CreatedAt))
+                        {
+                        @if (message.UserRole[0] == "Moderator" || message.UserRole[0] == "Psychologist")
+                        {
+
+                         <p @onclick="() => NavigateToMessage(message.Id, false)" style="cursor:pointer;">@GetTrimmed(message)</p>
+                        }
+                        }
+                        
                     </div>
                 </div>
             </div>
         </div>
-    </Authorized>
+       <div class="bottom-tabs">
+            @if (isUserInRole("Moderator"))
+            {
+                <div class="bottom-tab" @onclick="NavigateToPsychologist">
+                    <MudIcon Icon="@Icons.Material.Filled.Person" />
+                    <p>Mesaje pentru Psiholog</p>
+                </div>
+                
+                    <div class="bottom-tab" @onclick="NavigateToModerator">
+                        <MudIcon Icon="@Icons.Material.Filled.Person" />
+                        <p>Mesaje pentru Moderator</p>
+                </div>
+
+            }
+
+            else if (isUserInRole("Psychologist"))
+            {
+                <div class="bottom-tab" @onclick="NavigateToPsychologist">
+                    <MudIcon Icon="@Icons.Material.Filled.Person" />
+                    <p>Mesaje pentru Psiholog</p>
+                </div>
+            }
+        </div>
+
+</Authorized>
     <NotAuthorized>
         <MudText Typo="Typo.h6">You are not authorized to view this page. Redirecting to login...</MudText>
     </NotAuthorized>
 </AuthorizeView>
 
 @code {
-   [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
 
     private AuthenticationState authState;
     private List<MessageDto> messages = new List<MessageDto>();
@@ -404,4 +460,29 @@
     {
         NavigationManager.NavigateTo($"/user/{userId}");
     }
+
+    private void NavigateToUserMessage()
+    {
+        var userId = currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        NavigationManager.NavigateTo($"/messages/user/{userId}");
+    }
+
+    private string GetTrimmed(MessageDto message)
+    {
+        return  message.Content.Length > 100 ? message.Content.Substring(0, 100) + "..." : message.Content;
+    }
+
+    private void NavigateToModerator()
+    {
+        NavigationManager.NavigateTo($"/dashboard/moderator");
+        
+    }
+    private void NavigateToPsychologist()
+    {
+        NavigationManager.NavigateTo($"/dashboard/psychologist");
+
+    }
+
+
 }
