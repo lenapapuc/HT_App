@@ -1,11 +1,21 @@
 ﻿@page "/message/{messageId}"
+@using Client.Pages
+@using Microsoft.AspNetCore.Identity;
+@using System.Security.Claims;
 @using global::Shared;
 @layout EmptyLayout
 @inject ISnackbar Snackbar
 @inject HttpClient httpClient
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IJSRuntime JSRuntime
+
 @inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManger
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IHttpContextAccessor HttpContextAccessor
 @using Microsoft.AspNetCore.WebUtilities;
+
 
 <div class="message-details">
     @if (message != null)
@@ -26,6 +36,10 @@
             
             <MudCardContent>
                 <MudText Typo="Typo.body2">@message.Content</MudText>
+                <p style="padding:0px; margin-top:0px; margin-bottom:0px; cursor:pointer;" @onclick="() => ShowReplies(message.Id)">@message.RepliesNumber replies</p>
+
+
+               <ReplyComponent MessageId="@message.Id" ShowReplies="@showReplies" OnClose="HideReplies" />
 
                 @if (openReplyWindow)
                 {
@@ -112,6 +126,11 @@
     private MessageDto message;
     private bool openReplyWindow = false;
     private string replyContent;
+    private System.Security.Claims.ClaimsPrincipal currentUser;
+    private AuthenticationState authState;
+    private bool showReplies = false;
+    private string selectedMessageId;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -120,8 +139,20 @@
         {
             openReplyWindow = bool.Parse(reply);
         }
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        currentUser = authState.User;
 
-        await LoadMessage();
+        if (user.Identity.IsAuthenticated)
+        {
+           
+            await LoadMessage();
+        }
+        else
+        {
+            await Task.Delay(3000);
+            NavigationManager.NavigateTo("Identity/Account/Login");
+        }
     }
 
     private async Task LoadMessage()
@@ -152,6 +183,12 @@
 
     private async Task PostReply()
     {
+        var userId = currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "User ID not found.");
+            return;
+        }
         if (string.IsNullOrEmpty(replyContent))
         {
             Snackbar.Add("Reply content cannot be empty.", Severity.Warning);
@@ -161,7 +198,9 @@
         var replyDto = new MessageDtoPost
             {
                 Content = replyContent,
-                IntendedFor = "Community"
+                IntendedFor = message.IntendedFor,
+                UserId = userId,    
+                CreatedAt = DateTime.Now
             };
 
         var result = await httpClient.PostAsJsonAsync($"/api/messages/{message.Id}/reply", replyDto);
@@ -182,5 +221,16 @@
     private void NavigateToUser(string userId)
     {
         NavigationManager.NavigateTo($"/user/{userId}");
+    }
+
+    private void ShowReplies(string messageId)
+    {
+        selectedMessageId = messageId;
+        showReplies = true;
+    }
+
+    private void HideReplies()
+    {
+        showReplies = false;
     }
 }

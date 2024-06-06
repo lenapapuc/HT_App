@@ -104,130 +104,216 @@ namespace Server.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        [HttpGet]
+        [Route("{messageId}/replies")]
+      
+        public async Task<List<MessageDto>> GetReplies(Guid messageId)
+        {
+            var messages = await _context.Messages.Include(m => m.CreatedBy).Include(m=>m.OriginalMessage)
+                .Where(c => c.OriginalMessage.Id == messageId)
+                .ToListAsync();
 
+            var userIds = messages.Select(m => m.CreatedBy.Id).Distinct().ToList();
+            var userRoles = await _context.UserRoles
+                .Where(ur => userIds.Contains(ur.UserId))
+                .Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new { ur.UserId, r.Name })
+                .ToListAsync();
+
+            var userRolesDict = userRoles
+                .GroupBy(ur => ur.UserId)
+                .ToDictionary(g => g.Key, g => g.Select(ur => ur.Name).ToList());
+
+            var messageIds = messages.Select(m => m.Id).ToList();
+            var repliesCountDict = await _context.Messages
+                .Where(m => messageIds.Contains(m.OriginalMessage.Id))
+                .GroupBy(m => m.OriginalMessage.Id)
+                .Select(g => new { MessageId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(g => g.MessageId, g => g.Count);
+
+            List<MessageDto> messageList = new List<MessageDto>();
+            foreach (var message in messages)
+            {
+                var roles = userRolesDict.ContainsKey(message.CreatedBy.Id) ? userRolesDict[message.CreatedBy.Id] : new List<string>();
+                var repliesCount = repliesCountDict.ContainsKey(message.Id) ? repliesCountDict[message.Id] : 0;
+
+                MessageDto messageDto = new MessageDto
+                {
+                    Id = message.Id.ToString(),
+                    Content = message.Content,
+                    IntendedFor = message.IntendedFor,
+                    CreatedAt = message.CreatedDate,
+                    UserId = message.CreatedBy.Id.ToString(),
+                    Name = message.CreatedBy.Name,
+                    UserRole = roles,
+                    RepliesNumber = repliesCount // Set the replies count
+                };
+
+                messageList.Add(messageDto);
+            }
+
+            return messageList;
+        }
 
         [HttpGet]
 
         [Route("community")]
         public async Task<List<MessageDto>> GetMessagesCommunity()
         {
-            var messages = await _context.Messages.Include(m=>m.CreatedBy).Where(c => c.IntendedFor == "Community").ToListAsync();
+            var messages = await _context.Messages.Include(m => m.CreatedBy)
+                .Where(c => c.IntendedFor == "Community")
+                .Where(c => c.OriginalMessage == null)
+                .ToListAsync();
+
             var userIds = messages.Select(m => m.CreatedBy.Id).Distinct().ToList();
             var userRoles = await _context.UserRoles
-        .Where(ur => userIds.Contains(ur.UserId))
-        .Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new { ur.UserId, r.Name })
-        .ToListAsync();
+                .Where(ur => userIds.Contains(ur.UserId))
+                .Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new { ur.UserId, r.Name })
+                .ToListAsync();
+
             var userRolesDict = userRoles
-        .GroupBy(ur => ur.UserId)
-        .ToDictionary(g => g.Key, g => g.Select(ur => ur.Name).ToList());
+                .GroupBy(ur => ur.UserId)
+                .ToDictionary(g => g.Key, g => g.Select(ur => ur.Name).ToList());
+
+            var messageIds = messages.Select(m => m.Id).ToList();
+            var repliesCountDict = await _context.Messages
+                .Where(m => messageIds.Contains(m.OriginalMessage.Id))
+                .GroupBy(m => m.OriginalMessage.Id)
+                .Select(g => new { MessageId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(g => g.MessageId, g => g.Count);
+
             List<MessageDto> messageList = new List<MessageDto>();
             foreach (var message in messages)
             {
                 var roles = userRolesDict.ContainsKey(message.CreatedBy.Id) ? userRolesDict[message.CreatedBy.Id] : new List<string>();
+                var repliesCount = repliesCountDict.ContainsKey(message.Id) ? repliesCountDict[message.Id] : 0;
 
                 MessageDto messageDto = new MessageDto
                 {
-
                     Id = message.Id.ToString(),
                     Content = message.Content,
                     IntendedFor = message.IntendedFor,
                     CreatedAt = message.CreatedDate,
                     UserId = message.CreatedBy.Id.ToString(),
                     Name = message.CreatedBy.Name,
-                    UserRole = roles
+                    UserRole = roles,
+                    RepliesNumber = repliesCount // Set the replies count
                 };
 
                 messageList.Add(messageDto);
             }
-
 
             return messageList;
         }
 
         [HttpGet]
         [Route("moderator")]
-       
+
         public async Task<List<MessageDto>> GetMessagesModerator()
         {
-            var messages = await _context.Messages.Include(m => m.CreatedBy).Where(c => c.IntendedFor == "Moderator").ToListAsync();
+            var messages = await _context.Messages.Include(m => m.CreatedBy)
+                .Where(c => c.IntendedFor == "Moderator")
+                .Where(c => c.OriginalMessage == null)
+                .ToListAsync();
+
             var userIds = messages.Select(m => m.CreatedBy.Id).Distinct().ToList();
             var userRoles = await _context.UserRoles
-        .Where(ur => userIds.Contains(ur.UserId))
-        .Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new { ur.UserId, r.Name })
-        .ToListAsync();
+                .Where(ur => userIds.Contains(ur.UserId))
+                .Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new { ur.UserId, r.Name })
+                .ToListAsync();
+
             var userRolesDict = userRoles
-        .GroupBy(ur => ur.UserId)
-        .ToDictionary(g => g.Key, g => g.Select(ur => ur.Name).ToList());
+                .GroupBy(ur => ur.UserId)
+                .ToDictionary(g => g.Key, g => g.Select(ur => ur.Name).ToList());
+
+            var messageIds = messages.Select(m => m.Id).ToList();
+            var repliesCountDict = await _context.Messages
+                .Where(m => messageIds.Contains(m.OriginalMessage.Id))
+                .GroupBy(m => m.OriginalMessage.Id)
+                .Select(g => new { MessageId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(g => g.MessageId, g => g.Count);
+
             List<MessageDto> messageList = new List<MessageDto>();
             foreach (var message in messages)
             {
                 var roles = userRolesDict.ContainsKey(message.CreatedBy.Id) ? userRolesDict[message.CreatedBy.Id] : new List<string>();
+                var repliesCount = repliesCountDict.ContainsKey(message.Id) ? repliesCountDict[message.Id] : 0;
 
                 MessageDto messageDto = new MessageDto
                 {
-
                     Id = message.Id.ToString(),
                     Content = message.Content,
                     IntendedFor = message.IntendedFor,
                     CreatedAt = message.CreatedDate,
                     UserId = message.CreatedBy.Id.ToString(),
                     Name = message.CreatedBy.Name,
-                    UserRole = roles
+                    UserRole = roles,
+                    RepliesNumber = repliesCount // Set the replies count
                 };
 
                 messageList.Add(messageDto);
             }
 
-
             return messageList;
         }
-
         [HttpGet]
 
         [Route("psychologist")]
-     
+
         public async Task<List<MessageDto>> GetMessagesPsychologist()
         {
-            var messages = await _context.Messages.Include(m => m.CreatedBy).Where(c => c.IntendedFor == "Psychologist").ToListAsync();
+            var messages = await _context.Messages.Include(m => m.CreatedBy)
+                .Where(c => c.IntendedFor == "Psychologist")
+                .Where(c => c.OriginalMessage == null)
+                .ToListAsync();
+
             var userIds = messages.Select(m => m.CreatedBy.Id).Distinct().ToList();
             var userRoles = await _context.UserRoles
-        .Where(ur => userIds.Contains(ur.UserId))
-        .Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new { ur.UserId, r.Name })
-        .ToListAsync();
+                .Where(ur => userIds.Contains(ur.UserId))
+                .Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new { ur.UserId, r.Name })
+                .ToListAsync();
+
             var userRolesDict = userRoles
-        .GroupBy(ur => ur.UserId)
-        .ToDictionary(g => g.Key, g => g.Select(ur => ur.Name).ToList());
+                .GroupBy(ur => ur.UserId)
+                .ToDictionary(g => g.Key, g => g.Select(ur => ur.Name).ToList());
+
+            var messageIds = messages.Select(m => m.Id).ToList();
+            var repliesCountDict = await _context.Messages
+                .Where(m => messageIds.Contains(m.OriginalMessage.Id))
+                .GroupBy(m => m.OriginalMessage.Id)
+                .Select(g => new { MessageId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(g => g.MessageId, g => g.Count);
+
             List<MessageDto> messageList = new List<MessageDto>();
             foreach (var message in messages)
             {
                 var roles = userRolesDict.ContainsKey(message.CreatedBy.Id) ? userRolesDict[message.CreatedBy.Id] : new List<string>();
+                var repliesCount = repliesCountDict.ContainsKey(message.Id) ? repliesCountDict[message.Id] : 0;
 
                 MessageDto messageDto = new MessageDto
                 {
-
                     Id = message.Id.ToString(),
                     Content = message.Content,
                     IntendedFor = message.IntendedFor,
                     CreatedAt = message.CreatedDate,
                     UserId = message.CreatedBy.Id.ToString(),
                     Name = message.CreatedBy.Name,
-                    UserRole = roles
+                    UserRole = roles,
+                    RepliesNumber = repliesCount // Set the replies count
                 };
 
                 messageList.Add(messageDto);
             }
 
-
             return messageList;
         }
 
 
-        [HttpGet]
+            [HttpGet]
 
         [Route("user/{userId}")]
         public async Task<List<MessageDto>> GetMessagesByUserId(Guid userId)
         {
-            var messages = await _context.Messages.Include(m => m.CreatedBy).Where(c => c.CreatedBy.Id == userId).ToListAsync();
+            var messages = await _context.Messages.Include(m => m.CreatedBy).Where(c => c.CreatedBy.Id == userId).Where(c => c.OriginalMessage == null).ToListAsync();
             var userIds = messages.Select(m => m.CreatedBy.Id).Distinct().ToList();
             var userRoles = await _context.UserRoles
         .Where(ur => userIds.Contains(ur.UserId))
@@ -279,6 +365,9 @@ namespace Server.Controllers
                 .Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => r.Name)
                 .ToListAsync();
 
+            var repliesCount = await _context.Messages
+                .CountAsync(m => m.OriginalMessage.Id == id);
+
             MessageDto messageDto = new MessageDto
             {
                 Id = message.Id.ToString(),
@@ -287,11 +376,13 @@ namespace Server.Controllers
                 CreatedAt = message.CreatedDate,
                 UserId = message.CreatedBy.Id.ToString(),
                 Name = message.CreatedBy.Name,
-                UserRole = userRoles
+                UserRole = userRoles,
+                RepliesNumber = repliesCount // Set the replies count
             };
 
             return messageDto;
         }
+
 
         [HttpDelete]
         [Route("{id}")]
