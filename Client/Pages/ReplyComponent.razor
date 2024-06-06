@@ -1,56 +1,107 @@
 ﻿@using global::Shared;
 @inject HttpClient httpClient
+@inject NavigationManager NavigationManager
+
 
 @code {
     [Parameter] public string messageId { get; set; }
     [Parameter] public bool ShowReplies { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
     private List<MessageDto> replies;
+    private bool isLoading = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         replies = new();
         if (ShowReplies)
         {
+            isLoading = true;
             replies = await httpClient.GetFromJsonAsync<List<MessageDto>>($"/api/messages/{messageId}/replies");
+            isLoading = false;
         }
     }
-}
 
-@if (ShowReplies && replies.Count != 0) 
-{
-    <div class="replies">
-        <button @onclick="CloseReplies">Close</button>
-        <h3>Replies</h3>
-        @foreach (var reply in replies)
-        {
-            <div class="reply">
-                <MudCard Style="margin-bottom: 10px;">
-                    <MudCardHeader>
-                        <CardHeaderAvatar>
-                            <MudAvatar Size="Size.Large">@reply.Name.Substring(0, 1).ToUpper()</MudAvatar>
-                        </CardHeaderAvatar>
-                        <CardHeaderContent>
-                            <MudText Typo="Typo.body1"><strong>@reply.Name</strong></MudText>
-                            @if (reply.UserRole[0] != "User")
-                            {
-                                <MudText Typo="Typo.body2">@reply.UserRole[0]</MudText>
-                            }
-                        </CardHeaderContent>
-                    </MudCardHeader>
-                    <MudCardContent>
-                        <MudText Typo="Typo.body2">@reply.Content</MudText>
-                    </MudCardContent>
-                </MudCard>
-            </div>
-        }
-    </div>
-}
-
-@code {
     private void CloseReplies()
     {
         ShowReplies = false;
         OnClose.InvokeAsync();
     }
+    private void NavigateToUser(string userId)
+    {
+        NavigationManager.NavigateTo($"/user/{userId}");
+    }
 }
+
+@if (ShowReplies)
+{
+   
+        <div class="replies">
+        <button @onclick="CloseReplies" style="color: white;">Close</button>
+      
+            @foreach (var reply in replies)
+            {
+                <div class="reply">
+                    <MudCard Style="margin-bottom: 10px;">
+                        <MudCardHeader @onclick ="()=>NavigateToUser(reply.UserId)">
+                            <CardHeaderAvatar>
+                                <MudAvatar Size="Size.Large">@reply.Name.Substring(0, 1).ToUpper()</MudAvatar>
+                            </CardHeaderAvatar>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.body1"><strong>@reply.Name</strong></MudText>
+                                @if (reply.UserRole[0] != "User")
+                                {
+                                    <MudText Typo="Typo.body2">@reply.UserRole[0]</MudText>
+                                }
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudText Typo="Typo.body2">@reply.Content</MudText>
+                        </MudCardContent>
+
+    
+                    </MudCard>
+                </div>
+            }
+        </div>
+    
+}
+<style>
+    .mud-card {
+        box-shadow: none !important;
+        width: inherit;
+        
+    }
+
+    .replies
+    {
+        padding-left: 50px;
+    }
+
+    .reply
+    {
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .mud-card-header {
+        box-shadow: none !important;
+    }
+
+    .mud-card-content {
+        box-shadow: none !important;
+    }
+
+    .mud-card-actions {
+        box-shadow: none !important;
+    }
+
+    .mud-avatar {
+        box-shadow: none !important;
+    }
+
+    .mud-paper {
+        box-shadow: none !important;
+        padding-bottom: 50px;
+        width: 100%;
+        
+    }
+</style>

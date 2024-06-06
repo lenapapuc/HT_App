@@ -15,6 +15,7 @@ namespace Domain
 
         public Message? OriginalMessage { get; set; }
 
+
         public void AddReply(Message reply)
         {
             reply.OriginalMessage = this;
