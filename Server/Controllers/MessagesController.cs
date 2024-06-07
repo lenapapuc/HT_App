@@ -399,7 +399,7 @@ namespace Server.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateMessage(Guid id, [FromBody] MessageDtoPost dto)
+        public async Task<IActionResult> UpdateMessage(Guid id, [FromBody] MessageDto dto)
         {
             if (dto == null)
             {
@@ -418,14 +418,7 @@ namespace Server.Controllers
             {
                 message.Content = dto.Content;
             }
-            if (dto.IntendedFor != null)
-            {
-                message.IntendedFor = dto.IntendedFor;
-            }
-            if (dto.CreatedAt != default)
-            {
-                message.CreatedDate = dto.CreatedAt;
-            }
+           
 
             try
             {

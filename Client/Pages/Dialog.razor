@@ -18,19 +18,7 @@
             <MudAvatar Color="Color.Primary" Size="Size.Large">@currentUser.Name.Substring(0,1).ToUpper()</MudAvatar>
             <div class="content">
                 <MudTextField @bind-Value="@message.Content" Style="width: 380px; display=flex; justify-content:end;" T="string" Label="AutoGrow" Variant="Variant.Text" AutoGrow HelperText="This field grows when you enter new lines" />
-                 <div class="icons">
-                     <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
-                         <ButtonTemplate>
-                             <MudIconButton HtmlTag="label"
-                                            Color="Color.Dark"
-                                            Icon="@Icons.Material.Filled.Image"
-                                            for="@context.Id">
-                             </MudIconButton>
-                         </ButtonTemplate>
-                     </MudFileUpload>
-
-
-                 </div>
+                
              </div>
 
 

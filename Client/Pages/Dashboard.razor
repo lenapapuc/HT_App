@@ -256,42 +256,54 @@
                     <div class="messages">
                         @foreach (var message in messages.OrderByDescending(m => m.CreatedAt))
                         {
-                            @if(message.UserRole[0] == "User")
+                            @if (message.UserRole[0] == "User")
                             {
-                            <MudCard Style="margin-bottom: 10px;">
-                                <MudCardHeader @onclick="() => NavigateToUser(message.UserId)">
-                                    <CardHeaderAvatar>
-                                        <MudAvatar Size="Size.Large" @onclick="() => NavigateToUser(message.UserId)">@message.Name.Substring(0, 1).ToUpper()</MudAvatar>
-                                    </CardHeaderAvatar>
-                                    <CardHeaderContent >
-                                        <MudText Typo="Typo.body1"><strong>@message.Name</strong></MudText>
-                                        @if(message.UserRole[0] != "User"){
-                                            <MudText Typo="Typo.body2"> @message.UserRole[0]</MudText>
-                                        }
-                                    </CardHeaderContent>
+                                <MudCard Style="margin-bottom: 10px;">
+                                    <MudCardHeader @onclick="() => { if (!message.IsEditing) NavigateToUser(message.UserId); }">
+                                        <CardHeaderAvatar>
+                                            <MudAvatar Size="Size.Large">@message.Name.Substring(0, 1).ToUpper()</MudAvatar>
+                                        </CardHeaderAvatar>
+                                        <CardHeaderContent>
+                                            <MudText Typo="Typo.body1"><strong>@message.Name</strong></MudText>
+                                            @if (message.UserRole[0] != "User")
+                                            {
+                                                <MudText Typo="Typo.body2"> @message.UserRole[0]</MudText>
+                                            }
+                                        </CardHeaderContent>
 
-                                    <CardHeaderActions>
-                                        @if (isUserInRole("Moderator"))
+                                        <CardHeaderActions>
+                                            @if (isUserInRole("Moderator"))
+                                            {
+                                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async () => await Delete(message.Id))" />
+                                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" OnClick="() => EditMessage(message.Id)" />
+                                            }
+                                        </CardHeaderActions>
+                                    </MudCardHeader>
+
+                                    <MudCardContent @onclick="() => { if (!message.IsEditing) NavigateToMessage(message.Id, false); }">
+                                        @if (message.IsEditing)
                                         {
-                                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(async () => await Delete(message.Id))" />
+                                            <MudTextField @bind-Value="message.TempContent" />
+                                            <MudButton OnClick="() => SaveEdit(message.Id)">Save</MudButton>
+                                            <MudButton OnClick="() => CancelEdit(message.Id)">Cancel</MudButton>
                                         }
-                                    </CardHeaderActions>
-                                </MudCardHeader>
-
-                                <MudCardContent @onclick="() => NavigateToMessage(message.Id, false)">
-                                    <MudText Typo="Typo.body2">@message.Content</MudText>
-                                    <p style="padding:0px; margin-top:0px; margin-bottom:0px;">@message.RepliesNumber replies</p>
-                                </MudCardContent>
-                                <MudCardActions>
-                                    <MudButton OnClick="() => NavigateToMessage(message.Id, true)">
-                                        <MudIconButton Icon="@Icons.Material.Filled.Reply" Color="Color.Default" />
-                                        <p style="padding:0px; margin-top: 0px; margin-bottom:0px;">Reply</p>
-                                    </MudButton>
-                                </MudCardActions>
-                            </MudCard>
-                        }
+                                        else
+                                        {
+                                            <MudText Typo="Typo.body2">@message.Content</MudText>
+                                            <p style="padding:0px; margin-top:0px; margin-bottom:0px;">@message.RepliesNumber replies</p>
+                                        }
+                                    </MudCardContent>
+                                    <MudCardActions>
+                                        <MudButton OnClick="() => NavigateToMessage(message.Id, true)">
+                                            <MudIconButton Icon="@Icons.Material.Filled.Reply" Color="Color.Default" />
+                                            <p style="padding:0px; margin-top: 0px; margin-bottom:0px;">Reply</p>
+                                        </MudButton>
+                                    </MudCardActions>
+                                </MudCard>
+                            }
                         }
                     </div>
+
                 </div>
 
                 <div class="right-side">
@@ -409,6 +421,47 @@
         else
         {
             Snackbar.Add("Invalid message ID.", Severity.Error);
+        }
+    }
+
+
+    private void EditMessage(string id)
+    {
+        var message = messages.FirstOrDefault(m => m.Id == id);
+        if (message != null)
+        {
+            message.IsEditing = true;
+            message.TempContent = message.Content; // Store the current content in TempContent
+        }
+    }
+
+    private async Task SaveEdit(string id)
+    {
+        var message = messages.FirstOrDefault(m => m.Id == id);
+        if (message != null && !string.IsNullOrEmpty(message.TempContent))
+        {
+            message.Content = message.TempContent; // Update the content
+            message.IsEditing = false;
+
+            var response = await httpClient.PutAsJsonAsync($"/api/messages/{id}", message);
+            if (!response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Failed to update the message.", Severity.Error);
+            }
+            else
+            {
+                Snackbar.Add("Message updated successfully.", Severity.Success);
+            }
+        }
+    }
+
+    private void CancelEdit(string id)
+    {
+        var message = messages.FirstOrDefault(m => m.Id == id);
+        if (message != null)
+        {
+            message.IsEditing = false;
+            message.TempContent = string.Empty; // Clear the temporary content
         }
     }
 
