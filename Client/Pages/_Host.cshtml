@@ -50,9 +50,16 @@
                 text: () => response.text()
             };
         }
-    </script>
-    
 
+        window.initializeSvgInteractions = () => {
+            document.querySelectorAll('svg circle').forEach(circle => {
+                circle.addEventListener('click', event => {
+                    const regionName = event.target.getAttribute('class');
+                    DotNet.invokeMethodAsync('Client.Pages', 'ShowRegionData', regionName);
+                });
+            });
+        };
+    </script>
 
 </body>
 </html>

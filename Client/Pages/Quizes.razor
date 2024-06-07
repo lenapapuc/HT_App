@@ -1,0 +1,96 @@
+﻿@page "/quiz"
+
+@layout EmptyLayout
+
+@using MudBlazor
+@using Domain
+@using global::Shared
+@inject IJSRuntime JSRuntime
+@inject ISnackbar Snackbar
+@inject HttpClient httpClient
+
+@inject IDialogService DialogService
+@inject NavigationManager Navigation
+
+<MudGrid>
+    @foreach (var quiz in Quizzes)
+    {
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="4" Class="pa-4">
+                <MudText Typo="Typo.h6" Class="title-quiz">@quiz.Name</MudText>
+                <MudDivider Class="my-2" />
+                <MudText Typo="Typo.body2">Number of Questions: @quiz.NumberOfQuestions</MudText>
+                <MudText Typo="Typo.body2">Difficulty: @quiz.Difficulty</MudText>
+                <MudText Typo="Typo.body2">Rating: @quiz.Rating</MudText>
+                <MudButton Color="Color.Primary" OnClick="@(() => StartQuiz(quiz))">Start Quiz</MudButton>
+            </MudPaper>
+        </MudItem>
+    }
+</MudGrid>
+
+<style>
+    .title-quiz {
+        color: #800000; /* Match color with the header and footer */
+    }
+
+    .top-row {
+        margin-bottom: 0;
+    }
+
+    .img_quiz {
+        width: 300px;
+        height: auto;
+    }
+</style>
+
+
+@code {
+    private List<Quiz> Quizzes = new List<Quiz>
+    {
+        new Quiz { Name = "Generic trafic de ființe umane", NumberOfQuestions = 5, Difficulty = "Easy", Rating = 3.5, Questions = new List<Question> {
+            new Question { Text = "Ce reprezintă traficul de ființe umane?", ImageUrl = "generic-quiz/definition.jpg", Options = new List<string> { "Transferul legal de persoane între țări", "Exploatarea persoanelor prin forță, fraudă sau constrângere", "Transportul de bunuri ilegale", "Migrația forțată a refugiaților" }, CorrectAnswer = "Exploatarea persoanelor prin forță, fraudă sau constrângere" },
+            new Question { Text = "Care este scopul principal al traficului de ființe umane?", ImageUrl = "generic-quiz/exploation.jpg", Options = new List<string> { "Promovarea turismului", "Exploatarea muncii și exploatarea sexuală", "Asigurarea de locuințe pentru refugiați", "Îmbunătățirea economiei locale" }, CorrectAnswer = "Exploatarea muncii și exploatarea sexuală" },
+            new Question { Text = "Cine sunt cele mai frecvente victime ale traficului de ființe umane?", ImageUrl = "generic-quiz/target.jpg", Options = new List<string> { "Oameni bogați", "Turisti", "Politicieni", "Persoane vulnerabile, inclusiv femei și copii" }, CorrectAnswer = "Persoane vulnerabile, inclusiv femei și copii" },
+            new Question { Text = "Ce metodă este adesea folosită de traficanți pentru a atrage victimele?", ImageUrl = "generic-quiz/work.jpg", Options = new List<string> { "Promisiunea unui loc de muncă bine plătit", "Oferirea de burse educaționale", "Invitarea la evenimente culturale", "Oferirea de servicii medicale gratuite" }, CorrectAnswer = "Promisiunea unui loc de muncă bine plătit" },
+            new Question { Text = "Care este rolul principal al unui traficant în rețelele de trafic de ființe umane?", ImageUrl = "generic-quiz/traficant.webp", Options = new List<string> { "Organizarea de evenimente sociale", "Oferirea de burse educaționale", "Recrutarea, transportul și exploatarea victimelor", "Furnizarea de asistență juridică" }, CorrectAnswer = "Recrutarea, transportul și exploatarea victimelor" },
+        }},
+
+        new Quiz { Name = "Luptă împotriva traficului de ființe", NumberOfQuestions = 3, Difficulty = "Hard", Rating = 4.2, Questions = new List<Question> {
+            new Question { Text = "Ce organizație internațională se ocupă de combaterea traficului de ființe umane?", ImageUrl = "fight-quiz/OIM.jpg", Options = new List<string> { "OMS", "OIM", "FMI", "UNESCO" }, CorrectAnswer = "OIM" },
+            new Question { Text = "Ce document internațional abordează traficul de ființe umane?", ImageUrl = "fight-quiz/palermo.jpg", Options = new List<string> { "Declarația Universală a Drepturilor Omului", "Protocolul de la Palermo", "Convenția de la Paris", "Acordul de la Kyoto" }, CorrectAnswer = "Protocolul de la Palermo" },
+            new Question { Text = "Ce măsuri pot lua guvernele pentru a combate traficul de ființe umane?", ImageUrl = "fight-quiz/guvern.jpg", Options = new List<string> { "Reducerea impozitelor", "Creșterea prețurilor la carburanți", "Îmbunătățirea legislației și aplicarea legilor stricte", "Organizarea de evenimente sportive" }, CorrectAnswer = "Îmbunătățirea legislației și aplicarea legilor stricte" },
+        }},
+
+        new Quiz { Name = "Definiții în domeniu", NumberOfQuestions = 3, Difficulty = "Easy", Rating = 3.3, Questions = new List<Question> {
+            new Question { Text = "Ce este recrutarea în contextul traficului de ființe umane?", ImageUrl = "definition-quiz/recruiting.png", Options = new List<string> { "Procesul de atragere a victimelor prin diverse mijloace", "Înscrierea în cluburi sportive", "Înscrierea la cursuri educaționale", "Angajarea în companii de top" }, CorrectAnswer = "Procesul de atragere a victimelor prin diverse mijloace" },
+            new Question { Text = "Ce înseamnă tranzit în contextul traficului de ființe umane?", ImageUrl = "definition-quiz/transport.jpg", Options = new List<string> { "Transportul legal de persoane", "Transferul de bunuri", "Transportul ilegal de persoane prin diferite țări", "Organizarea de excursii" }, CorrectAnswer = "Transportul ilegal de persoane prin diferite țări" },
+            new Question { Text = "Ce este traficul de organe în contextul traficului de ființe umane?", ImageUrl = "definition-quiz/organs.jpg", Options = new List<string> { "Comerțul legal de organe", "Extracția și vânzarea ilegală de organe umane", "Donarea voluntară de organe", "Transportul de echipamente medicale" }, CorrectAnswer = "Extracția și vânzarea ilegală de organe umane" },
+        }},
+
+        new Quiz { Name = "Metode și motive", NumberOfQuestions = 2, Difficulty = "Medium", Rating = 4.0, Questions = new List<Question> {
+            new Question { Text = "Care este unul dintre principalele motive pentru care traficul de ființe umane continuă să existe?", ImageUrl = "motives-quiz/motive.webp", Options = new List<string> { "Creșterea turismului", "Asigurarea de educație pentru toți", "Organizarea de evenimente sociale", "Profiturile mari generate de exploatarea victimelor" }, CorrectAnswer = "Profiturile mari generate de exploatarea victimelor" },
+            new Question { Text = "Care sunt cele mai frecvente metode de control folosite de traficanți asupra victimelor?", ImageUrl = "motives-quiz/metode.jpg", Options = new List<string> { "Oferirea de cadouri", "Amenințările și violența", "Organizarea de excursii", "Invitarea la evenimente sociale" }, CorrectAnswer = "Amenințările și violența" },
+        }},
+
+        new Quiz { Name = "Persoanele afectate", NumberOfQuestions = 2, Difficulty = "Medium", Rating = 3.7, Questions = new List<Question> {
+            new Question { Text = "Care sunt cele mai afectate arii de traficul de ființe umane?", ImageUrl = "affect-quiz/ariile.webp", Options = new List<string> { "Țările dezvoltate și zonele urbane", "Țările în curs de dezvoltare și zonele rurale", "Țările nordice și regiunile polare", "Țările insulare și regiunile montane" }, CorrectAnswer = "Țările în curs de dezvoltare și zonele rurale" },
+            new Question { Text = "Ce țări sunt cele mai afectate de traficul de ființe umane?", ImageUrl = "affect-quiz/tarile.jpg", Options = new List<string> { "Țările cu conflicte armate", "Țările cu economii puternice", "Insulele izolate", "Țările pacifiste" }, CorrectAnswer = "Țările cu conflicte armate" },
+        }},
+
+    };
+
+    private async Task StartQuiz(Quiz quiz)
+    {
+        var parameters = new DialogParameters { ["Quiz"] = quiz };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Large };
+        var dialog = DialogService.Show<QuizDialog>("Quiz", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            var score = (int)result.Data;
+            var message = $"Congratulations! You answered {score} out of {quiz.NumberOfQuestions} questions correctly.";
+            Snackbar.Add(message, Severity.Success);
+        }
+    }
+}

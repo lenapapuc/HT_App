@@ -1,0 +1,69 @@
+﻿@page "/news"
+
+@layout EmptyLayout
+
+@using MudBlazor
+@using Domain
+@using global::Shared
+@inject IJSRuntime JSRuntime
+@inject ISnackbar Snackbar
+@inject HttpClient httpClient
+@inject IDialogService DialogService
+
+<MudGrid>
+    @foreach (var news in NewsList)
+    {
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard>
+                <MudCardMedia Image="@news.ImageUrl" Class="image-news" />
+                <MudCardContent>
+                    <MudText Typo="Typo.h6">
+                        <a href="@news.Link" target="_blank" Class="news-title">@news.Title</a>
+                    </MudText>
+                    <MudDivider />
+                    <MudText Typo="Typo.body1">@news.ShortDescription</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
+</MudGrid>
+
+<style>
+    .news-title {
+        color: #800000; /* Match the header and footer color */
+    }
+
+    .top-row {
+        margin-bottom: 0;
+    }
+</style>
+
+@code {
+    private List<NewsDomain> NewsList = new List<NewsDomain>
+    {
+        new NewsDomain
+        {
+            Title = "Consolidarea capacităților profesionale ale inspectorilor de muncă",
+            ImageUrl = "news-img/consol.jpg",
+            ShortDescription = "Organizația Internațională pentru Migrație, Misiunea în Republica Moldova în parteneriat cu Inspectoratul de Stat al Muncii al Republicii Moldova a organizat la 17 și 26 aprilie training-uri de o zi pentru angajații Inspectoratului de Stat al Muncii cu tema „Consolidarea capacităților angajaților Inspectoratului de Stat al Muncii pentru dezvoltarea abilitaților și tehnicilor de identificare a cazurilor de trafic de ființe umane și trafic de copii în rândul muncitorilor migranți pe teritoriul Republicii Moldova”.",
+            Link = "https://www.antitrafic.gov.md/libview.php?l=ro&idc=94&id=1461&t=/Presa/Stiri-si-Evenimente/Consolidarea-capacitatilor-profesionale-ale-inspectorilor-de-munca"
+        },
+        new NewsDomain
+        {
+            Title = "Instruire a agenților economici privind angajarea pe teritoriul Republicii Moldova a cetățenilor străini",
+            ImageUrl = "news-img/instruire.jpg",
+            ShortDescription = "La 24 aprilie 2024 sub egida Direcției drepturilor omului și cooperarea cu societatea civilă a Cancelariei de Stat, în colaborare cu Direcția generală ocuparea forței de muncă municipiul Chișinău și cu suportul Misiunii Organizației Internaționale pentru Migrație din Moldova",
+            Link = "https://www.antitrafic.gov.md/libview.php?l=ro&idc=94&id=1460&t=/Presa/Stiri-si-Evenimente/Instruire-a-agentilor-economici-privind-angajarea-pe-teritoriul-Republicii-Moldova-a-cetatenilor-straini"
+        },
+        new NewsDomain
+        {
+            Title = "Atelier de lucru privind gestionarea cazurilor de trafic de ființe umane a cetățenilor străini",
+            ImageUrl = "news-img/atelier.jpg",
+            ShortDescription = "În perioada 11-12 aprilie 2024 sub egida Cancelariei de Stat, Direcția drepturile omului și cooperarea cu societatea civilă, a fost organizat un Atelier de lucru ”Privind gestionarea cazurilor de trafic de ființe umane (TFU) cu exploatarea persoanelor, cetățeni străini”.",
+            Link = "https://www.antitrafic.gov.md/libview.php?l=ro&idc=94&id=1459&t=/Presa/Stiri-si-Evenimente/Atelier-de-lucru-privind-gestionarea-cazurilor-de-trafic-de-fiinte-umane-a-cetatenilor-straini"
+        },
+    };
+}
+
+
+            

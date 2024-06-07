@@ -21,11 +21,11 @@
         </MudCard>
         <MudNavMenu Class="nav-menu">
             <MudNavLink @onclick="NavigateToCharts"><MudText Typo="Typo.body1">Charts</MudText></MudNavLink>
-            <MudNavLink Href="#"><MudText Typo="Typo.body1">Quizzes</MudText></MudNavLink>
-            <MudNavLink Href="#"><MudText Typo="Typo.body1">News</MudText></MudNavLink>
-            <MudNavLink Href="#"><MudText Typo="Typo.body1">Map</MudText></MudNavLink>
-            <MudNavLink Href="#"><MudText Typo="Typo.body1">Donation</MudText></MudNavLink>
-            <MudNavLink Href="#"><MudText Typo="Typo.body1">Forum</MudText></MudNavLink>
+            <MudNavLink @onclick="NavigateToQuiz"><MudText Typo="Typo.body1">Quizzes</MudText></MudNavLink>
+            <MudNavLink @onclick="NavigateToNews"><MudText Typo="Typo.body1">News</MudText></MudNavLink>
+            <MudNavLink @onclick="NavigateToMap"><MudText Typo="Typo.body1">Map</MudText></MudNavLink>
+            <MudNavLink @onclick="NavigateToDonation"><MudText Typo="Typo.body1">Donation</MudText></MudNavLink>
+            <MudNavLink @onclick="NavigateToForum"><MudText Typo="Typo.body1">Forum</MudText></MudNavLink>
         </MudNavMenu>
     </MudItem>
     <MudItem xs="10" Class="content">
@@ -35,7 +35,7 @@
                     <MudItem xs="12">
                         <MudCard Class="card">
                             <MudCardContent>
-                                <MudText Typo="Typo.h6">Numărul de cazuri anual</MudText>
+                                <MudText Typo="Typo.h6" card-title>Numărul de cazuri anuale</MudText>
                                 <div @onclick="NavigateToCharts" style="cursor: pointer;">
                                     <MudChart ChartType="ChartType.Donut" Width="250px" Height="250px" InputData="@data" InputLabels="@labels">
                                         <CustomGraphics>
@@ -51,7 +51,7 @@
                         <MudCard Class="card">
                             <MudCardContent>
                                 <MudText Typo="Typo.h6" Class="card-title">Testeazăți cunoștințele</MudText>
-                                <MudButton Class="start-quiz-button" Variant="Variant.Filled" Color="Color.Primary">Start Quiz</MudButton>
+                                <MudButton @onclick="NavigateToQuiz" Class="start-quiz-button" Variant="Variant.Filled" Color="Color.Primary">Alege activitatea</MudButton>
                             </MudCardContent>
                         </MudCard>
                     </MudItem>
@@ -81,17 +81,17 @@
                     <MudItem xs="12">
                         <MudCard Class="card">
                             <MudCardContent>
-                                <MudText Typo="Typo.h6">Harta Republicii Moldova</MudText>
-                                <MudImage Src="map_md.webp" Alt="Interactive Map" Class="inter_map" />
-                                <MudButton @onclick="NavigateToMap" Variant="Variant.Filled" Color="Color.Primary">Intercționează cu harta</MudButton>
+                                <MudText Typo="Typo.h6" Class="card-title">Repartizarea pe toată Republica</MudText>
+                                <MudImage Src="map_md.webp" Alt="Interactive Map" @onclick="NavigateToMap" Class="inter_map" />
+                                <MudButton @onclick="NavigateToMap" Variant="Variant.Filled" Color="Color.Primary">Interacționează cu harta</MudButton>
                             </MudCardContent>
                         </MudCard>
                     </MudItem>
                     <MudItem xs="12">
                         <MudCard Class="card">
                             <MudCardContent>
-                                <MudText Typo="Typo.h6">Donation</MudText>
-                                <!-- Add Donation Content Here -->
+                                <MudText Typo="Typo.h6" Class="card-title">Acțiuni de caritate în Moldova</MudText>
+                                <MudButton @onclick="NavigateToDonation" Variant="Variant.Filled" Color="Color.Primary" Class="start-quiz-button">Donează bani</MudButton>
                             </MudCardContent>
                         </MudCard>
                     </MudItem>
@@ -186,6 +186,7 @@
         margin-top: 26px; /* Add space between the text and button */
     }
 
+
     .card-title {
         color: #800000; /* Match the header and footer color */
     }
@@ -218,7 +219,7 @@
     }
 
     .inter_map {
-        width: 250px;
+        width: 230px;
         height: auto;
     }
 </style>
@@ -235,7 +236,13 @@
     }
 
     private List<NewsItem> newsItems = new List<NewsItem>
-    {
+    {   
+        new NewsItem
+        {
+            Title = "Grupul operativ de lucru privind traficul de ființe umane s-a întrunit în ședință",
+            Link = "https://www.antitrafic.gov.md/libview.php?l=ro&idc=94&id=1462&t=/Presa/Stiri-si-Evenimente/Grupul-operativ-de-lucru-privind-traficul-de-fiinte-umane-s-a-intrunit-in-edinta",
+            Date = new DateTime(2024, 06, 06)
+        },
         new NewsItem
         {
             Title = "Consolidarea capacităților profesionale ale inspectorilor de muncă",
@@ -290,5 +297,25 @@
     private void NavigateToMap()
     {
         Navigation.NavigateTo("/map");
+    }
+
+    private void NavigateToForum()
+    {
+        Navigation.NavigateTo("/dashboard");
+    }
+
+     private void NavigateToQuiz()
+    {
+        Navigation.NavigateTo("/quiz");
+    }
+
+    private void NavigateToDonation()
+    {
+        Navigation.NavigateTo("/donation");
+    }
+
+    private void NavigateToNews()
+    {
+        Navigation.NavigateTo("/news");
     }
 }

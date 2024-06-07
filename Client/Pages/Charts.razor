@@ -14,7 +14,7 @@
 <MudGrid Class="main-grid" Spacing="0" Style="margin: 0; padding: 0;">
     <MudItem xs="8" Class="charts">
         <MudPaper Class="pa-4">
-            <MudText Typo="Typo.h5" Class="header-color">Pie Chart</MudText>
+            <MudText Typo="Typo.h5" Class="header-color">Numărul de victime a traficului de ființe umane anual</MudText>
             <MudGrid>
                 <MudItem xs="9">
                     <MudChart ChartType="ChartType.Pie" InputData="@data.ToArray()" @bind-SelectedIndex="Index" InputLabels="@labels.ToArray()" Width="300px" Height="300px" />
@@ -27,9 +27,9 @@
         </MudPaper>
 
         <MudPaper Class="pa-4 mt-0">
-            <MudText Typo="Typo.h5" Class="header-color">Line Chart</MudText>
+            <MudText Typo="Typo.h5" Class="header-color">Raportul victimolor de traficul ființelor umane</MudText>
             <div>
-                <MudChart ChartType="ChartType.Line" ChartSeries="@Series" @bind-SelectedIndex="LineIndex" XAxisLabels="@XAxisLabels" Width="100%" Height="350px" ChartOptions="@Options" />
+                <MudChart ChartType="ChartType.Line" ChartSeries="@Series" @bind-SelectedIndex="LineIndex" XAxisLabels="@XAxisLabels" Width="100%" Height="370px" ChartOptions="@Options" />
                 <MudGrid>
                     <MudItem xs="6">
                         <MudSlider @bind-Value="Options.LineStrokeWidth" Min="1" Max="10" Color="Color.Info">Line Width: @Options.LineStrokeWidth.ToString()</MudSlider>
@@ -42,18 +42,18 @@
         <MudPaper Class="pa-4">
             <MudText Typo="Typo.h5" Class="header-color">Victim Statistics</MudText>
             <ul class="bullet-list">
-                <li><span class="year">2010:</span> Moldova was reported to have identified approximately 108 victims of trafficking.</li>
-                <li><span class="year">2011:</span> Similar numbers to 2010, with continuous international and domestic efforts to combat trafficking.</li>
-                <li><span class="year">2012-2013:</span> The country identified 84 victims in 2012 and 82 in 2013.</li>
-                <li><span class="year">2014:</span> There were 69 victims identified, with most cases related to forced labor and sexual exploitation.</li>
-                <li><span class="year">2015:</span> The number of identified victims was 73.</li>
-                <li><span class="year">2016:</span> Moldova identified 85 victims, and efforts included the strengthening of legal frameworks and support services.</li>
-                <li><span class="year">2017:</span> The country reported 86 identified victims, reflecting a steady recognition and support trend.</li>
-                <li><span class="year">2018:</span> There were 83 victims identified, and the government initiated numerous prosecutions for trafficking offenses.</li>
-                <li><span class="year">2019:</span> Moldova reported identifying around 80 victims, with significant prosecutions and legal actions against traffickers.</li>
-                <li><span class="year">2020:</span> Detailed numbers for victims identified are not specified, but Moldova continued efforts against trafficking, placing it on the Tier 2 Watch List.</li>
-                <li><span class="year">2021:</span> The country identified and assisted 58 victims, with additional victims from previous years receiving continued support.</li>
-                <li><span class="year">2022:</span> Similar to 2021, Moldova identified 58 victims, with the majority being women and girls. Most cases involved forced labor and sexual exploitation.</li>
+                <li><span class="year">2010:</span> S-a raportat că Moldova a identificat aproximativ 108 victime ale traficului.</li>
+                <li><span class="year">2011:</span> Cifre similare cu cele din 2010, cu eforturi continue internaționale și interne de combatere a traficului.</li>
+                <li><span class="year">2012-2013:</span> Țara a identificat 84 de victime în 2012 și 82 în 2013.</li>
+                <li><span class="year">2014:</span> Au fost identificate 69 de victime, majoritatea cazurilor fiind legate de muncă forțată și exploatare sexuală.</li>
+                <li><span class="year">2015:</span> Numărul victimelor identificate a fost de 73.</li>
+                <li><span class="year">2016:</span> Moldova a identificat 85 de victime, iar eforturile au inclus consolidarea cadrelor legale și a serviciilor de sprijin.</li>
+                <li><span class="year">2017:</span> Țara a raportat 86 de victime identificate, reflectând o tendință constantă de recunoaștere și sprijin.</li>
+                <li><span class="year">2018:</span> Au fost identificate 83 de victime, iar guvernul a inițiat numeroase urmăriri penale pentru infracțiuni de trafic.</li>
+                <li><span class="year">2019:</span> Moldova a raportat că a identificat aproximativ 80 de victime, cu urmăriri penale și acțiuni legale semnificative împotriva traficanților.</li>
+                <li><span class="year">2020:</span> Numerele detaliate pentru victimele identificate nu sunt specificate, dar Republica Moldova a continuat eforturile împotriva traficului, plasând-o pe Lista de supraveghere a nivelului 2.</li>
+                <li><span class="year">2021:</span> Țara a identificat și a asistat 58 de victime, victime suplimentare din anii precedenți primind sprijin continuu.</li>
+                <li><span class="year">2022:</span> Similar cu 2021, Moldova a identificat 58 de victime, majoritatea fiind femei și fete. Majoritatea cazurilor au implicat muncă forțată și exploatare sexuală.</li>
             </ul>
         </MudPaper>
     </MudItem>
