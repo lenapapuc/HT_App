@@ -12,5 +12,7 @@
         public int RepliesNumber { get; set; }
 
         public List<string>? UserRole { get; set; }
+        public bool IsEditing { get; set; } = false; // New property to track editing state
+        public string? TempContent { get; set; }
     }
 }
