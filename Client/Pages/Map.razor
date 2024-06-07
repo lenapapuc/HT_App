@@ -8,17 +8,16 @@
 @inject IJSRuntime JSRuntime
 @inject ISnackbar Snackbar
 @inject HttpClient httpClient
-
 @inject IDialogService DialogService
 
 <MudGrid>
-    <MudItem xs="6">
+    <MudItem xs="9">
         <MudCard Class="card">
             <MudCardContent>
-                <MudText Typo="Typo.h6">Map</MudText>
+                <MudText Typo="Typo.h6" title_color>Harta Republicii Moldova cu numărul de victime</MudText>
                 @if (!string.IsNullOrEmpty(MapSvgContent))
                 {
-                    <div @key="MapSvgContent" @onclick="ShowRegionData">
+                    <div @key="MapSvgContent" @onload="InitializeSvgInteractions">
                         @((MarkupString)MapSvgContent)
                     </div>
                 }
@@ -29,18 +28,39 @@
             </MudCardContent>
         </MudCard>
     </MudItem>
-    <MudItem xs="6">
+    <MudItem xs="3">
         <MudCard Class="card">
             <MudCardContent>
-                <MudText Typo="Typo.h6">Statistics</MudText>
-                <!-- Display statistics here -->
+                <MudText Typo="Typo.h6" Class="title_color">Cazurile pe regiune</MudText>
+                <ul>
+                    @foreach (var region in Regions)
+                    {
+                        <li>@region</li>
+                    }
+                </ul>
             </MudCardContent>
         </MudCard>
     </MudItem>
 </MudGrid>
 
+<style>
+    .map {
+        width: 100%;
+        height: auto;
+    }
+
+    .top-row {
+        margin-bottom: 0;
+    }
+
+    .title_color {
+        color: #800000; /* Match color with the header and footer */
+    }
+</style>
+
 @code {
     private string MapSvgContent { get; set; } = string.Empty;
+    private List<string> Regions = new List<string>();
 
     private async Task InitializeMap()
     {
@@ -48,12 +68,57 @@
         {
             var svgPath = "md.svg";
             MapSvgContent = await httpClient.GetStringAsync(svgPath);
+            InitializeRegionsList();
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error fetching SVG: {ex.Message}");
         }
         StateHasChanged();
+    }
+
+    private void InitializeRegionsList()
+    {
+        Regions = new List<string>
+        {
+            "Anenii Noi (MDAN)",
+            "Balti (MDBA)",
+            "Basarabeasca (MDBS)",
+            "Bender (MDBD)",
+            "Briceni (MDBR)",
+            "Cahul (MDCA)",
+            "Calarasi (MDCL)",
+            "Cantemir (MDCT)",
+            "Causeni (MDCS)",
+            "Chisinau (MDCU)",
+            "Cimislia (MDCM)",
+            "Criuleni (MDCR)",
+            "Donduseni (MDDO)",
+            "Drochia (MDDR)",
+            "Dubasari (MDDU)",
+            "Edinet (MDED)",
+            "Falesti (MDFA)",
+            "Floresti (MDFL)",
+            "Glodeni (MDGL)",
+            "Hincesti (MDHI)",
+            "Ialoveni (MDIA)",
+            "Leova (MDLE)",
+            "Nisporeni (MDNI)",
+            "Ocnita (MDOC)",
+            "Orhei (MDOR)",
+            "Rezina (MDRE)",
+            "Riscani (MDRI)",
+            "Singerei (MDSI)",
+            "Soldanesti (MDSD)",
+            "Soroca (MDSO)",
+            "Stefan Voda (MDSV)",
+            "Straseni (MDST)",
+            "Taraclia (MDTA)",
+            "Telenesti (MDTE)",
+            "Transnistria (MDSN)",
+            "Ungheni (MDUN)",
+            "Unitate Teritoriala Autonoma Gagauzia (MDGA)"
+        };
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -64,29 +129,14 @@
         }
     }
 
-    private void ShowRegionData(MouseEventArgs e)
+    [JSInvokable]
+    public void ShowRegionData(string regionName)
     {
-        var regionName = GetRegionNameFromEvent(e);
-        var victimCount = regionName switch
-        {
-            "Chisinau" => 65,
-            "Soroca" => 20,
-            "Balti" => 35,
-            _ => 0
-        };
-        Snackbar.Add($"{regionName} - {victimCount} victims", Severity.Info);
+        Snackbar.Add($"{regionName} clicked", Severity.Info);
     }
 
-    private string GetRegionNameFromEvent(MouseEventArgs e)
+    private async Task InitializeSvgInteractions()
     {
-        // Implement logic to determine the region name based on mouse event coordinates or other criteria
-        var x = e.ClientX;
-        var y = e.ClientY;
-
-        if (x < 200 && y < 200) return "Chisinau";
-        if (x >= 200 && y < 200) return "Soroca";
-        if (x < 200 && y >= 200) return "Balti";
-
-        return "Unknown";
+        await JSRuntime.InvokeVoidAsync("initializeSvgInteractions");
     }
 }

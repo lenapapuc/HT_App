@@ -1,0 +1,96 @@
+﻿@using MudBlazor
+@inject NavigationManager Navigation
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">@Quiz.Name</MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (!quizCompleted)
+        {
+            <MudText Typo="Typo.h6">@CurrentQuestion.Text</MudText>
+            <MudImage Src="@CurrentQuestion.ImageUrl" Alt="Question Image" />
+            <MudList>
+                @foreach (var option in CurrentQuestion.Options)
+                {
+                    <MudListItem @onclick="() => SelectOption(option)" Class="@GetOptionClass(option)">
+                        @option
+                    </MudListItem>
+                }
+            </MudList>
+        }
+        else
+        {
+            <MudText Typo="Typo.h6">Congratulations! You answered @CorrectAnswers out of @Quiz.NumberOfQuestions questions correctly.</MudText>
+            <MudText Typo="Typo.h6">Rate the Quiz:</MudText>
+            <MudRating SelectedValueChanged="UpdateRating" MaxValue="5" />
+        }
+    </DialogContent>
+    <DialogActions>
+        @if (!quizCompleted)
+        {
+            @if (CurrentQuestionIndex < Quiz.Questions.Count - 1)
+            {
+                <MudButton Color="Color.Primary" OnClick="NextQuestion">Next</MudButton>
+            }
+            else
+            {
+                <MudButton Color="Color.Primary" OnClick="FinishQuiz">Finish</MudButton>
+            }
+        }
+        <MudButton Color="Color.Secondary" OnClick="MudDialog.Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public Quiz Quiz { get; set; }
+
+    private int CurrentQuestionIndex { get; set; }
+    private Question CurrentQuestion => Quiz.Questions[CurrentQuestionIndex];
+    private string SelectedOption { get; set; }
+    private int CorrectAnswers { get; set; }
+    private bool quizCompleted = false;
+
+    private void SelectOption(string option)
+    {
+        SelectedOption = option;
+    }
+
+    private void NextQuestion()
+    {
+        if (SelectedOption == CurrentQuestion.CorrectAnswer)
+        {
+            CorrectAnswers++;
+        }
+        SelectedOption = null;
+        CurrentQuestionIndex++;
+    }
+
+    private void FinishQuiz()
+    {
+        if (SelectedOption == CurrentQuestion.CorrectAnswer)
+        {
+            CorrectAnswers++;
+        }
+        quizCompleted = true;
+    }
+
+    private void UpdateRating(int rating)
+    {
+        Quiz.Rating = rating;
+        MudDialog.Close(DialogResult.Ok(CorrectAnswers));
+    }
+
+    private string GetOptionClass(string option)
+    {
+        return option == SelectedOption ? "selected-option" : "";
+    }
+}
+
+<style>
+    .selected-option {
+        background-color: #d3d3d3;
+    }
+</style>
